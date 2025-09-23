@@ -19,6 +19,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
+@Table(name = "runs")
 public class Run {
 
     @Id
@@ -42,6 +43,7 @@ public class Run {
     private LocalDateTime createdOn;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private RunVisibility visibility;
 
     @ManyToOne(fetch = FetchType.LAZY)
