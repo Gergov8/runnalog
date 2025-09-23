@@ -4,11 +4,10 @@ import com.gergov.runnaLog.comment.model.Comment;
 import com.gergov.runnaLog.goal.model.Goal;
 import com.gergov.runnaLog.like.model.Like;
 import com.gergov.runnaLog.run.model.Run;
+import com.gergov.runnaLog.stats.model.Stats;
+import com.gergov.runnaLog.subscription.model.Subscription;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
 import java.time.LocalDateTime;
@@ -16,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -70,5 +70,11 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Goal> goals = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Stats stats;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Subscription> subscriptions = new ArrayList<>();
 }
 
