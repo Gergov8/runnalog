@@ -4,16 +4,15 @@ import com.gergov.runnaLog.comment.model.Comment;
 import com.gergov.runnaLog.like.model.Like;
 import com.gergov.runnaLog.user.model.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,10 +28,15 @@ public class Run {
     @Column(nullable = false)
     private Double distance;
 
-    @Column(nullable = false)
-    private Double duration;
+    private Integer hours;
 
-    private Double pace;
+    @Column(nullable = false)
+    private Integer minutes;
+
+    @Column(nullable = false)
+    private Integer seconds;
+
+    private String pace;
 
     @Column(nullable = false)
     private String title;

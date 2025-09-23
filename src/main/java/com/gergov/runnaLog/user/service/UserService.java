@@ -1,15 +1,15 @@
 package com.gergov.runnaLog.user.service;
 
-import com.gergov.runnaLog.stats.model.Stats;
 import com.gergov.runnaLog.stats.service.StatsService;
 import com.gergov.runnaLog.subscription.service.SubscriptionService;
 import com.gergov.runnaLog.user.model.User;
 import com.gergov.runnaLog.user.model.UserRole;
 import com.gergov.runnaLog.user.repository.UserRepository;
+import com.gergov.runnaLog.web.dto.LoginRequest;
 import com.gergov.runnaLog.web.dto.RegisterRequest;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +34,24 @@ public class UserService {
         this.subscriptionService = subscriptionService;
     }
 
+    public User login(LoginRequest loginRequest) {
+
+        Optional<User> optionalUser = userRepository.findByUsername(loginRequest.username());
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("Incorrect username or password.");
+        }
+
+        String rawPassword = loginRequest.password();
+        String hashedPassword = optionalUser.get().getPassword();
+
+        if (!passwordEncoder.matches(rawPassword, hashedPassword)) {
+            throw new RuntimeException("Incorrect username or password.");
+        }
+
+        return optionalUser.get();
+    }
+
+    @Transactional
     public void register(RegisterRequest registerRequest) {
 
         Optional<User> optionalUserName = userRepository.findByUsername(registerRequest.username());

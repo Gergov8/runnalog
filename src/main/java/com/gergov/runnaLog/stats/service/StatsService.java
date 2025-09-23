@@ -25,7 +25,7 @@ public class StatsService {
                 .user(user)
                 .totalRuns(0)
                 .totalDistance(0.0)
-                .totalDuration(0.0)
+                .totalDuration(0)
                 .pb1km(null)
                 .pb5km(null)
                 .pb10km(null)

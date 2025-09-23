@@ -31,13 +31,13 @@ public class Stats {
     private Double totalDistance;
 
     @Column(nullable = false)
-    private Double totalDuration;
+    private Integer totalDuration;
 
-    private Duration pb1km;
+    private String pb1km;
 
-    private Duration pb5km;
+    private String pb5km;
 
-    private Duration pb10km;
+    private String pb10km;
 
     private Integer strides;
 
