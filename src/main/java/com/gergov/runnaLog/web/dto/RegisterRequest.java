@@ -23,7 +23,8 @@ public record RegisterRequest (
         @NotNull(message = "Country is required.")
         UserCountry country
 
-) {}
+) {
+}
 
 
 

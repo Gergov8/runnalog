@@ -3,8 +3,7 @@ package com.gergov.runnaLog.run.service;
 import com.gergov.runnaLog.run.model.Run;
 import com.gergov.runnaLog.run.model.RunVisibility;
 import com.gergov.runnaLog.run.repository.RunRepository;
-import com.gergov.runnaLog.stats.model.Stats;
-import com.gergov.runnaLog.stats.repository.StatsRepository;
+import com.gergov.runnaLog.stats.service.StatsService;
 import com.gergov.runnaLog.user.model.User;
 import com.gergov.runnaLog.web.dto.CreateRunRequest;
 import jakarta.transaction.Transactional;
@@ -24,27 +23,27 @@ public class RunService {
 
 
     private final RunRepository runRepository;
-    private final StatsRepository statsRepository;
+    private final StatsService statsService;
+
 
     @Autowired
-    public RunService(RunRepository runRepository, StatsRepository statsRepository) {
+    public RunService(RunRepository runRepository, StatsService statsService) {
         this.runRepository = runRepository;
-        this.statsRepository = statsRepository;
+        this.statsService = statsService;
     }
 
     public Run createRun(CreateRunRequest createRunRequest, User user) {
 
-        // Смята пълното време в секунди
-        Integer totalSeconds = calculateTotalSeconds(createRunRequest.hours(), createRunRequest.minutes(), createRunRequest.seconds());
+        // Смята колко секунди са изминали за бягането
+        long totalSeconds;
+        totalSeconds = calculateTotalSeconds(createRunRequest.duration());
 
-        // Изчислява темпо в секунди на километър, след което форматира като MM:SS
+        // Изчислява темпо в секунди на километър, след което го превръща в минути на км (MM:SS)
         String pace = calculatePace(totalSeconds, createRunRequest.distance());
 
         Run run = Run.builder()
                 .distance(createRunRequest.distance())
-                .hours(createRunRequest.hours())
-                .minutes(createRunRequest.minutes())
-                .seconds(createRunRequest.seconds())
+                .duration(createRunRequest.duration())
                 .pace(pace)
                 .title(createRunRequest.title())
                 .description(createRunRequest.description())
@@ -55,27 +54,31 @@ public class RunService {
 
         Run savedRun =  runRepository.save(run);
 
-        updateUserStats(user, createRunRequest.distance(), totalSeconds, pace);
+        statsService.updateUserStatsAfterRun(user, createRunRequest.distance(), totalSeconds, pace);
+
+        long hours = totalSeconds / 3600;
+        long minutes = totalSeconds % 3600 / 60;
+        long seconds =  totalSeconds % 60;
 
         log.info("User [%s] created a run of [%.2f] km in [%d]:[%d]:[%d]".formatted(user.getUsername(), createRunRequest.distance(),
-                createRunRequest.hours(), createRunRequest.minutes(), createRunRequest.seconds()));
+                hours, minutes, seconds));
         return savedRun;
     }
 
-    private Integer calculateTotalSeconds(Integer hours, Integer minutes, Integer seconds) {
-        return (hours * 3600) + (minutes * 60) + seconds;
+    private Long calculateTotalSeconds(Duration duration) {
+        return duration.getSeconds();
     }
 
-    private String calculatePace(Integer totalSeconds, Double distance) {
+    private String calculatePace(long totalSeconds, Double distance) {
 
         // Темпо в секунди на км
-        int paceSeconds = (int) (totalSeconds / distance);
+        double paceSecondsPerKm = totalSeconds / distance;
 
         // Форматирани в MM:SS
-        int paceMinutes = paceSeconds / 60;
-        int paceSecondsRemainder = paceSeconds % 60;
+        long minutes = (long) (paceSecondsPerKm / 60);
+        long seconds = (long) (paceSecondsPerKm % 60);
 
-        return String.format("%d:%02d", paceMinutes, paceSecondsRemainder);
+        return String.format("%d:%02d", minutes, seconds);
     }
 
 
@@ -88,80 +91,6 @@ public class RunService {
 //        }
 //
 //    }
-
-    // Получава темпо в секунди (за изчисления) (извлечено от формат "5:30")
-    private Integer parsePaceToSeconds(String paceString) {
-
-        String[] parts = paceString.split(":");
-        int minutes = Integer.parseInt(parts[0]);
-        int seconds = Integer.parseInt(parts[1]);
-        return (minutes * 60) + seconds;
-    }
-
-
-    private void updateUserStats(User user, Double distance, Integer totalSeconds, String pace) {
-        Stats stats = user.getStats();
-        stats.setTotalRuns(stats.getTotalRuns() + 1);
-        stats.setTotalDistance(stats.getTotalDistance() + distance);
-        stats.setTotalDuration(stats.getTotalDuration() + totalSeconds);
-        stats.setLastActivity(LocalDateTime.now());
-
-        updatePersonalBests(stats, distance, pace);
-        updateStridesEarned(stats, distance, totalSeconds);
-
-        statsRepository.save(stats);
-    }
-
-    private void updatePersonalBests(Stats stats, Double distance, String pace) {
-        Integer paceSeconds = parsePaceToSeconds(pace);
-
-        if (paceSeconds == Integer.MAX_VALUE) return; // Invalid pace
-
-
-        if (distance >= 1.0) {
-            if (stats.getPb1km() == null || paceSeconds < parsePaceToSeconds(stats.getPb1km())) {
-                stats.setPb1km(pace);
-                log.debug("New 1km personal best: {} min/km", pace);
-            }
-        }
-
-
-        if (distance >= 5.0) {
-            if (stats.getPb5km() == null || paceSeconds < parsePaceToSeconds(stats.getPb5km())) {
-                stats.setPb5km(pace);
-                log.debug("New 5km personal best: {} min/km", pace);
-            }
-        }
-
-
-        if (distance >= 10.0) {
-            if (stats.getPb10km() == null || paceSeconds < parsePaceToSeconds(stats.getPb10km())) {
-                stats.setPb10km(pace);
-                log.debug("New 10km personal best: {} min/km", pace);
-            }
-        }
-    }
-
-    private void updateStridesEarned(Stats stats, Double distance, Integer totalSeconds) {
-        // Основно вънаграждение -> 10 strides на км
-        int stridesEarned = (int) (distance * 10);
-
-        double paceMinPerKm = (totalSeconds / 60.0) / distance;
-
-        // Бонус за скорост -> по-бързо темпо = повече strides
-        if (paceMinPerKm < 4.0) stridesEarned += 50;  // Elite pace (< 4:00 min/km)
-        else if (paceMinPerKm < 5.0) stridesEarned += 30;  // Fast pace (< 5:00 min/km)
-        else if (paceMinPerKm < 6.0) stridesEarned += 15;  // Average pace (< 6:00 min/km)
-
-        // Бонус за дистанция
-        if (distance >= 21.1) stridesEarned += 100;  // Half-marathon
-        else if (distance >= 10.0) stridesEarned += 50;  // 10k+
-        else if (distance >= 5.0) stridesEarned += 20;  // 5k+
-
-        stats.setStrides(stats.getStrides() + stridesEarned);
-        log.debug("User earned [%d] strides for this run".formatted(stridesEarned));
-    }
-
 
     public List<Run> getVisibleRuns(User currentUser) {
         if (currentUser == null) {

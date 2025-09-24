@@ -6,25 +6,15 @@ import jakarta.validation.constraints.*;
 import java.time.Duration;
 
 public record CreateRunRequest(
+
         @NotNull(message = "Distance is required.")
         @Positive(message = "Distance must be positive.")
         @Min(1)
         Double distance,
 
-        @Min(0)
-        @Max(23)
-        Integer hours,  // 0-23 hours
-
-        @NotNull(message = "Minutes are required.")
-        @Min(0)
-        @Max(59)
-        Integer minutes,  // 0-59 minutes
-
-        @NotNull(message = "Seconds are required.")
-        @Min(0)
-        @Max(59)
-        Integer seconds,  // 0-59 seconds
-
+        @NotNull(message = "Duration is required.")
+        @Positive(message = "Duration must be positive.")
+        Duration duration,
 
         @NotBlank(message = "Title is required.")
         String title,

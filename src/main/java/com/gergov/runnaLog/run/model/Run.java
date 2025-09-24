@@ -28,13 +28,8 @@ public class Run {
     @Column(nullable = false)
     private Double distance;
 
-    private Integer hours;
-
     @Column(nullable = false)
-    private Integer minutes;
-
-    @Column(nullable = false)
-    private Integer seconds;
+    private Duration duration;
 
     private String pace;
 
