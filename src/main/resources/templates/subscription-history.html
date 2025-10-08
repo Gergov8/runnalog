@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUNNALOG - Grounded in Motion</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/subscription-history.css}">
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="logo">RUNNALOG</div>
+    <div class="header-actions">
+        <a href="/feed" class="btn btn-outline">Feed</a>
+        <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="btn btn-primary">Profile</a>
+    </div>
+</div>
+
+<!-- Page -->
+<div class="page">
+    <div class="card">
+        <div class="card-title">Subscription History</div>
+
+        <table class="subscription-table">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Subscription Type</th>
+                <th>Status</th>
+                <th>Period</th>
+                <th>Price (Strides)</th>
+                <th>Effective From</th>
+                <th>Effective To</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="subscription : ${user.subscriptions}">
+                    <td data-label="Id" th:text="${subscription.id}">1</td>
+                    <td data-label="Subscription Type" th:text="${subscription.type}">RECREATIONAL (0 strides)</td>
+                    <td data-label="Status">
+                        <p style="color: #00d26a; font-weight: 700;" th:if="${subscription.status.name() == 'ACTIVE'}" class="status active">ACTIVE</p>
+                        <p style="color: #1565c0; font-weight: 700;" th:if="${subscription.status.name() == 'COMPLETED'}" class="status completed">COMPLETED</p>
+                        <p style="color: #c62828; font-weight: 700;" th:if="${subscription.status.name() == 'TERMINATED'}" class="status terminated">TERMINATED</p>
+                    </td>
+                    <td data-label="Period" th:text="${subscription.period}">MONTHLY</td>
+                    <td data-label="Price" th:text="${subscription.price}">0</td>
+                    <td data-label="Effective From" th:text="${#temporals.format(subscription.createdOn, 'dd MMM YYYY HH:mm')}">2025-01-01</td>
+                    <td data-label="Effective To" th:text="${#temporals.format(subscription.expiryOn, 'dd MMM YYYY HH:mm')}">2025-01-31</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

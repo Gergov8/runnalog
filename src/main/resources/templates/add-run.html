@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Run - RUNNALOG</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header class="header">
+    <div class="logo"><a href="/feed">RUNNALOG</a></div>
+    <div class="header-actions">
+        <a class="btn btn-primary" href="/feed">FEED</a>
+    </div>
+</header>
+
+<main class="page">
+    <section class="card">
+        <h1 class="card-title">ADD RUN</h1>
+        <form class="form" method="post" onsubmit="return validateRunForm()">
+
+            <div class="form-row">
+                <label class="label" for="distance">DISTANCE (KM):</label>
+                <input class="input" id="distance" name="distance" type="number" min="1" step="0.01" required>
+            </div>
+
+            <div class="form-row">
+                <label class="label">DURATION:</label>
+                <div style="display:flex;gap:10px;">
+                    <input class="input" id="hours" name="hours" type="number" min="0" max="24" placeholder="HH" required>
+                    <input class="input" id="minutes" name="minutes" type="number" min="0" max="59" placeholder="MM" required>
+                    <input class="input" id="seconds" name="seconds" type="number" min="0" max="59" placeholder="SS" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label class="label" for="title">TITLE:</label>
+                <input class="input" id="title" name="title" type="text" required>
+            </div>
+
+            <div class="form-row">
+                <label class="label" for="description">DESCRIPTION (OPTIONAL):</label>
+                <textarea class="input" id="description" name="description" rows="3"></textarea>
+            </div>
+
+            <div class="form-row">
+                <label class="label" for="visibility">VISIBILITY:</label>
+                <select class="select" id="visibility" name="visibility">
+                    <option value="PUBLIC">Public</option>
+                    <option value="PRIVATE">Private</option>
+                </select>
+            </div>
+
+            <button class="btn btn-primary" type="submit">ADD RUN</button>
+        </form>
+    </section>
+</main>
+
+<script>
+    function validateRunForm() {
+        let distance = parseFloat(document.getElementById('distance').value);
+        let hh = parseInt(document.getElementById('hours').value);
+        let mm = parseInt(document.getElementById('minutes').value);
+        let ss = parseInt(document.getElementById('seconds').value);
+
+        if (distance < 1) {
+            alert("Distance must be at least 1 km.");
+            return false;
+        }
+        if (hh > 24 || mm > 59 || ss > 59) {
+            alert("Please enter a valid duration (max 24h, 59m, 59s).");
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

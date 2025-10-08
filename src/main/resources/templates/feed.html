@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feed - RUNNALOG</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/feed.css}">
+</head>
+<body>
+<header class="header">
+    <div class="logo"><a href="/feed">RUNNALOG</a></div>
+    <div class="header-actions">
+        <input class="input" type="search" placeholder="Search runs, people">
+        <button class="btn btn-primary"><a href="/add">Add Run</button>
+        <button class="btn btn-primary"><a href="/subscriptions">Upgrade</a></button>
+        <div class="avatar-sm" title="You"><a th:href="@{'/users/' + ${user.id} + '/profile'}">.</a></div>
+    </div>
+</header>
+
+<main class="page feed">
+    <div class="feed-container">
+        <div class="feed-layout">
+            <!-- Profile section -->
+            <aside class="profile-card">
+                <div class="avatar-lg">
+                    <a th:href="@{'/users/' + ${user.id} + '/profile'}">
+                        <img th:src="${#strings.isEmpty(user.profilePicture) ? 'https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg' : user.profilePicture}" alt="Profile picture">
+                    </a>
+                </div>
+
+                <a th:href="@{'/users/' + ${user.id} + '/profile'}">
+                <div class="profile-name" th:text="${user.username}">martin_gergov</div>
+                </a>
+                <div class="profile-status">
+                    <span th:if="${user.isActive()}" class="active-profile">ACTIVE</span>
+                    <span th:if="${!user.isActive()}" class="inactive-profile">INACTIVE</span>
+                </div>
+                <div class="profile-stats">
+                    <div class="profile-row"><span class="muted">Total runs</span><strong th:text="${stats.totalRuns}">10</strong></div>
+                    <div class="profile-row"><span class="muted">Total distance</span><strong th:text="${stats.totalDistance}">100 km</strong></div>
+                    <div class="profile-row"><span class="muted">Total duration</span><strong  th:text="${stats.totalDuration}">09:00:00</strong></div>
+                </div>
+            </aside>
+
+            <!-- Runs section -->
+            <section class="runs-section">
+<!--                <h2 class="section-title">Recent Runs</h2>-->
+                
+                <!-- Run 1 -->
+                <article class="feed-card">
+                    <div class="feed-header">
+                        <div class="avatar-sm">👤</div>
+                        <div>
+                            <div class="feed-user">georgi_gergov</div>
+                            <div class="feed-sub">Morning Run • 2h ago</div>
+                        </div>
+                    </div>
+                    <div class="metrics">
+                        <div class="metric"><div class="metric-k">Distance</div><div class="metric-v">10 km</div></div>
+                        <div class="metric"><div class="metric-k">Duration</div><div class="metric-v">00:40:00</div></div>
+                        <div class="metric"><div class="metric-k">Pace</div><div class="metric-v">04:00 /km</div></div>
+                    </div>
+                    <div class="map-placeholder"></div>
+                    <div class="feed-actions"><span>❤️ Like</span><span>💬 Comment</span><span>↗ Share</span></div>
+                    <div class="comments">
+                        <div class="comment">
+                            <div class="avatar-xs">👤</div>
+                            <div><strong>maria</strong> Nice pace!</div>
+                        </div>
+                        <div class="comment-input">
+                            <input class="input" type="text" placeholder="Add a comment">
+                            <button class="btn btn-primary" type="button">Post</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Run 2 -->
+                <article class="feed-card">
+                    <div class="feed-header">
+                        <div class="avatar-sm">👤</div>
+                        <div>
+                            <div class="feed-user">ivan_ivanov</div>
+                            <div class="feed-sub">Lunch Run • 6h ago</div>
+                        </div>
+                    </div>
+                    <div class="metrics">
+                        <div class="metric"><div class="metric-k">Distance</div><div class="metric-v">5 km</div></div>
+                        <div class="metric"><div class="metric-k">Duration</div><div class="metric-v">00:25:00</div></div>
+                        <div class="metric"><div class="metric-k">Pace</div><div class="metric-v">05:00 /km</div></div>
+                    </div>
+                    <div class="map-placeholder"></div>
+                    <div class="feed-actions"><span>❤️ Like</span><span>💬 Comment</span><span>↗ Share</span></div>
+                    <div class="comments">
+                        <div class="comment-input">
+                            <input class="input" type="text" placeholder="Add a comment">
+                            <button class="btn btn-primary" type="button">Post</button>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Run 3 -->
+                <article class="feed-card">
+                    <div class="feed-header">
+                        <div class="avatar-sm">👤</div>
+                        <div>
+                            <div class="feed-user">maria.petkova</div>
+                            <div class="feed-sub">Evening Long Run • 1d ago</div>
+                        </div>
+                    </div>
+                    <div class="metrics">
+                        <div class="metric"><div class="metric-k">Distance</div><div class="metric-v">15 km</div></div>
+                        <div class="metric"><div class="metric-k">Duration</div><div class="metric-v">01:20:00</div></div>
+                        <div class="metric"><div class="metric-k">Pace</div><div class="metric-v">05:20 /km</div></div>
+                    </div>
+                    <div class="map-placeholder"></div>
+                    <div class="feed-actions"><span>❤️ Like</span><span>💬 Comment</span><span>↗ Share</span></div>
+                </article>
+            </section>
+        </div>
+    </div>
+</main>
+</script>
+</body>
+</html>

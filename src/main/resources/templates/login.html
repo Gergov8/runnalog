@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - RUNNALOG</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <header class="header">
+        <div class="logo"><a href="/">RUNNALOG</a></div>
+        <div class="header-actions">
+            <a class="btn btn-primary" href="/register">REGISTER</a>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="card">
+            <h1 class="card-title">LOGIN</h1>
+            <form class="form" method="post">
+                <div class="form-row">
+                    <label class="label" for="username">USERNAME OR EMAIL:</label>
+                    <input class="input" id="username" type="text" required>
+                </div>
+                <div class="form-row">
+                    <label class="label" for="password">PASSWORD:</label>
+                    <input class="input" id="password" type="password" required>
+                </div>
+                <button class="btn btn-primary" type="submit">LOGIN</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
+

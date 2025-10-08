@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - RUNNALOG</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const countries = /*[[${T(com.gergov.runnaLog.user.model.UserCountry).values()}]]*/ [];
+        /*]]>*/
+    </script>
+</head>
+<body>
+    <header class="header">
+        <div class="logo"><a href="/">RUNNALOG</a></div>
+        <div class="header-actions">
+            <a class="btn btn-primary" href="/login">LOGIN</a>
+        </div>
+    </header>
+
+    <main class="page">
+        <section class="card">
+            <h1 class="card-title">REGISTRATION</h1>
+            <form class="form" method="post">
+                <div class="form-row">
+                    <label class="label" for="username">USERNAME:</label>
+                    <input class="input" id="username" type="text" required>
+                </div>
+                <div class="form-row">
+                    <label class="label" for="email">EMAIL:</label>
+                    <input class="input" id="email" type="email" required>
+                </div>
+                <div class="form-row">
+                    <label class="label" for="password">PASSWORD:</label>
+                    <input class="input" id="password" type="password" required>
+                </div>
+                <div class="form-row">
+                    <label class="label" for="country">COUNTRY:</label>
+                    <select class="select" id="country">
+                        <option th:each="c : ${T(com.gergov.runnaLog.user.model.UserCountry).values()}" th:value="${c}" th:text="${c}"></option>
+                    </select>
+                </div>
+
+                <button class="btn btn-primary" type="submit">REGISTER</button>
+            </form>
+        </section>
+    </main>
+</body>
+</html>
+

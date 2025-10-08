@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUNNALOG - Grounded in Motion</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/subscription-history.css}">
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="logo">RUNNALOG</div>
+    <div class="header-actions">
+        <a href="/feed" class="btn btn-outline">Feed</a>
+<!--        <a th:href="@{'/users/' + ${users} + '/profile'}" class="btn btn-primary">Profile</a>-->
+    </div>
+</div>
+
+<!-- Page -->
+<div class="page">
+    <div class="card">
+        <div class="card-title">Subscription History</div>
+
+        <table class="subscription-table">
+            <thead>
+            <tr>
+                <th>Id</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Country</th>
+                <th>Status</th>
+                <th>Created on</th>
+                <th>Switch status</th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td data-label="Id" th:text="${user.id}">1</td>
+                    <td data-label="Username" th:text="${user.username}">Vik123</td>
+                    <td data-label="Email" th:text="${user.email}">marto8@gmail.com</td>
+                    <td data-label="Role" th:text="${user.role.getDisplayName()}">User</td>
+                    <td data-label="Country" th:text="${user.country.getDisplayName()}">Bulgaria</td>
+                    <td data-label="Status">
+                        <p style="color: #00d26a; font-weight: 700;" th:if="${user.active}">Active</p>
+                        <p style="color: #1565c0; font-weight: 700;" th:if="${!user.active}" class="status completed">Inactive</p>
+                    </td>
+                    <td data-label="Created on" th:text="${#temporals.format(user.createdOn, 'dd MMM YYYY HH:mm')}">2025-01-01</td>
+                    <td data-label="Switch status"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

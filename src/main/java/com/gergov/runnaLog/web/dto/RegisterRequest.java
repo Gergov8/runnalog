@@ -5,7 +5,9 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
+@Builder
 public record RegisterRequest (
 
         @Size(min = 6, max = 25, message = "Username length must be between 6 and 25 symbols.")
@@ -22,7 +24,6 @@ public record RegisterRequest (
 
         @NotNull(message = "Country is required.")
         UserCountry country
-
 ) {
 }
 

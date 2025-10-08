@@ -14,7 +14,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -36,12 +38,12 @@ public class UserService {
 
     public User login(LoginRequest loginRequest) {
 
-        Optional<User> optionalUser = userRepository.findByUsername(loginRequest.username());
+        Optional<User> optionalUser = userRepository.findByUsername(loginRequest.getUsername());
         if (optionalUser.isEmpty()) {
             throw new RuntimeException("Incorrect username or password.");
         }
 
-        String rawPassword = loginRequest.password();
+        String rawPassword = loginRequest.getPassword();
         String hashedPassword = optionalUser.get().getPassword();
 
         if (!passwordEncoder.matches(rawPassword, hashedPassword)) {
@@ -80,5 +82,30 @@ public class UserService {
         subscriptionService.createDefaultSubscription(user);
 
         log.info("New user profile was registered in the system for user [%s].".formatted(registerRequest.username()));
+    }
+
+    public List<User> getAll() {
+
+        return userRepository.findAll();
+    }
+
+    public User getByUsername(String username) {
+
+        return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User with [%s] username not found.".formatted(username)));
+    }
+
+    public User getById(UUID id) {
+
+        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User with [%s] id does not exist.".formatted(id)));
+    }
+
+    public void updateUserProfile(UUID id, User formUser) {
+        User existingUser = getById(id);
+
+        existingUser.setFirstName(formUser.getFirstName());
+        existingUser.setLastName(formUser.getLastName());
+        existingUser.setProfilePicture(formUser.getProfilePicture());
+
+        userRepository.save(existingUser);
     }
 }

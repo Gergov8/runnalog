@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - RUNNALOG</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+</head>
+<body>
+    <header class="header">
+        <div class="logo"><a href="/feed">RUNNALOG</a></div>
+        <div class="header-actions">
+            <a class="btn btn-primary" href="/feed">FEED</a>
+        </div>
+    </header>
+
+    <main class="page profile-page">
+        <div class="profile-container">
+            <div class="profile-grid">
+
+                <!-- Left rail: latest runs / subscription history -->
+                <aside class="p-card">
+                    <h3 class="rail-title">Latest Runs</h3>
+                    <div class="rail-list">
+                        <div class="rail-item"><div class="icon">🏃</div><div><strong>5 km</strong> • 00:26:00</div></div>
+                        <div class="rail-item"><div class="icon">🏃</div><div><strong>10 km</strong> • 00:45:00</div></div>
+                    </div>
+
+                    <hr style="margin:12px 0;border:0;border-top:1px solid #eceef1;">
+
+                    <h3 class="rail-title"><a href="/subscriptions/history">Subscription History</a></h3>
+                    <div class="rail-list">
+                        <div class="rail-item"><div class="icon">⭐</div><div>Pro Monthly • Active</div></div>
+                        <div class="rail-item"><div class="icon">⭐</div><div>Coach Plan • Canceled (Aug)</div></div>
+                    </div>
+                </aside>
+
+                <!-- Main profile card -->
+                <section class="p-card profile-card">
+                    <div class="avatar-lg"><img th:src="${#strings.isEmpty(user.profilePicture) ? 'https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg' : user.profilePicture}" alt="Profile picture"></div>
+                    <div class="profile-username" th:text="${user.username}">User Name</div>
+                    <div class="profile-status">
+                        <span th:if="${user.isActive()}" class="active-profile">ACTIVE</span>
+                        <span th:if="${!user.isActive()}" class="inactive-profile">INACTIVE</span>
+                    </div>
+                    <div class="user-info">
+                        <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+                        <strong>User ID:</strong>
+                        <p th:text="${user.id}">id</p>
+                        <strong>First Name:</strong>
+                        <p th:text="${#strings.isEmpty(user.firstName) ? 'Unknown' : user.firstName}">fn</p>
+                        <strong>Last Name:</strong>
+                        <p th:text="${#strings.isEmpty(user.lastName) ? 'Unknown' : user.lastName}">ln</p>
+                        <strong>Email:</strong>
+                        <p th:text="${user.email}">email</p>
+                        <strong>Joined:</strong>
+                        <p th:text="${#temporals.format(user.createdOn, 'dd MMM. YYYY HH:mm')}">date</p>
+                        <strong>Country:</strong>
+                        <p th:text="${user.country}">country</p>
+                    </div>
+                    <div class="profile-stats">
+                        <div class="profile-row"><span class="muted">Total runs</span><strong th:text="${stats.totalRuns}">10</strong></div>
+                        <div class="profile-row"><span class="muted">Total distance</span><strong th:text="${stats.totalDistance}">100 km</strong></div>
+                        <div class="profile-row"><span class="muted">Total duration</span><strong th:text="${stats.totalDuration}">09:00:00</strong></div>
+                    </div>
+                    <a class="btn btn-primary" th:href="@{'/users/' + ${user.id} + '/profile' + '/edit'}">Edit Profile</a>
+                </section>
+
+                <!-- Right rail: subscriptions -->
+                <aside class="p-card">
+                    <h3 class="rail-title">Subscriptions</h3>
+                    <div class="subs-list">
+                        <div class="subs-item"><div class="icon">⭐</div><div>Pro Monthly • Next bill: 15 Oct</div></div>
+                        <div class="subs-item"><div class="icon">⭐</div><div>Coach Plan • Trial ends in 12 days</div></div>
+                        <div class="subs-item"><div class="icon">⭐</div><div>Friends Club • Active</div></div>
+                    </div>
+
+                    <div class="single-section-box home-subscription">
+                        <div class="default-label-box">
+                            <p th:text="${user.subscriptions[0].type + ' SUBSCRIPTION'}">ULTIMATE SUBSCRIPTION</p>
+                        </div>
+                        <table class="styled-table">
+                            <thead>
+                            <tr>
+                                <th>Status</th>
+                                <th>Period</th>
+                                <th>Price</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td th:if="${user.subscriptions[0].status.name() == 'ACTIVE'}"><span class="status active">ACTIVE</span></td>
+                                <td th:if="${user.subscriptions[0].status.name() == 'COMPLETED'}"><span class="status completed">COMPLETED</span></td>
+                                <td th:if="${user.subscriptions[0].status.name() == 'TERMINATED'}"><span class="status terminated">TERMINATED</span></td>
+                                <td th:text="${user.subscriptions[0].period}">Monthly</td>
+                                <td th:text="${user.subscriptions[0].price + ' STR'}">49.99 EUR</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </aside>
+
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+

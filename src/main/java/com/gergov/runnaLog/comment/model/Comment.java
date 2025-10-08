@@ -3,14 +3,12 @@ package com.gergov.runnaLog.comment.model;
 import com.gergov.runnaLog.run.model.Run;
 import com.gergov.runnaLog.user.model.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Builder
 @Getter
 @Setter
 @NoArgsConstructor

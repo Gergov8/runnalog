@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile - RUNNALOG</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<header class="header">
+    <div class="logo"><a href="/feed">RUNNALOG</a></div>
+    <div class="header-actions">
+        <a class="btn btn-primary" th:href="@{'/users/' + ${user.id} + '/profile'}">PROFILE</a>
+    </div>
+</header>
+
+<main class="page">
+    <section class="card">
+        <h1 class="card-title">EDIT PROFILE</h1>
+        <form th:action="@{'/users/' + ${user.id} + '/profile'}"
+              th:object="${user}"
+              class="form"
+              method="post">
+            <div class="form-row">
+                <label class="label" for="firstName">FIRST NAME:</label>
+                <input class="input" id="firstName" th:field="*{firstName}" type="text">
+            </div>
+            <div class="form-row">
+                <label class="label" for="lastname">LAST NAME:</label>
+                <input class="input" id="lastname" th:field="*{lastName}" type="text" >
+            </div>
+            <div class="form-row">
+                <label class="label" for="profilePicture">PROFILE PICTURE URL:</label>
+                <input class="input" id="profilePicture" name="profilePicture" type="url" placeholder="https://..." th:field="*{profilePicture}">
+            </div>
+            <button class="btn btn-primary" type="submit">
+                    SAVE CHANGES
+            </button>
+        </form>
+    </section>
+</main>
+</body>
+</html>

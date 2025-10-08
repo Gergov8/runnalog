@@ -75,6 +75,7 @@ public class User {
     private Stats stats;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OrderBy("createdOn ASC")
     private List<Subscription> subscriptions = new ArrayList<>();
 }
 

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subscriptions - RUNNALOG</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .plans {
+            display: grid;
+            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            margin-top: 20px;
+        }
+        .plan-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+        }
+        .plan-title {
+            font-family: 'Anton', sans-serif;
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #222;
+        }
+        .plan-price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #00d26a;
+            margin-bottom: 16px;
+        }
+        .plan-features {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            color: #6b6e72;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        .plan-features li {
+            margin: 6px 0;
+        }
+    </style>
+</head>
+<body>
+<header class="header">
+    <div class="logo"><a href="/feed">RUNNALOG</a></div>
+    <div class="header-actions">
+        <a class="btn btn-primary" href="/feed">FEED</a>
+    </div>
+</header>
+
+<main class="page">
+    <section class="feed-wrap">
+        <h1 class="section-title">Choose Your Plan</h1>
+        <div class="plans">
+            <div class="plan-card">
+                <div class="plan-title">Basic</div>
+                <div class="plan-price">Free</div>
+                <ul class="plan-features">
+                    <li>Track unlimited runs</li>
+                    <li>Basic stats</li>
+                </ul>
+                <button class="btn btn-primary">Select</button>
+            </div>
+            <div class="plan-card">
+                <div class="plan-title">Pro</div>
+                <div class="plan-price">€9.99 / month</div>
+                <ul class="plan-features">
+                    <li>Advanced analytics</li>
+                    <li>Custom training plans</li>
+                    <li>No ads</li>
+                </ul>
+                <button class="btn btn-primary">Subscribe</button>
+            </div>
+            <div class="plan-card">
+                <div class="plan-title">Ultimate</div>
+                <div class="plan-price">€19.99 / month</div>
+                <ul class="plan-features">
+                    <li>Everything in Pro</li>
+                    <li>1-on-1 coaching</li>
+                    <li>Exclusive events</li>
+                </ul>
+                <button class="btn btn-primary">Subscribe</button>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,368 @@
+/* ==========================================================================
+   FONTS
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Montserrat:wght@400;600;800;900&display=swap');
+
+@font-face {
+    font-family: 'Chokana';
+    src: url('/static/fonts/Chokana.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ==========================================================================
+   RESET & BASE
+   ========================================================================== */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    font-family: 'Montserrat', Arial, sans-serif;
+    background: #212123;
+    color: #111;
+}
+
+/* ==========================================================================
+   HEADER
+   ========================================================================== */
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 32px;
+    background: #3a3637;
+}
+
+.logo {
+    font-family: 'Chokana', 'Anton', sans-serif;
+    color: #00d26a;
+    font-size: 34px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.header-actions {
+    display: flex;
+    gap: 16px;
+}
+
+.header a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* ==========================================================================
+   BUTTONS
+   ========================================================================== */
+
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background: #00d26a;
+    color: #111;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    background: #00b65a;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 2px solid #00d26a;
+    color: #00d26a;
+}
+
+/* ==========================================================================
+   LAYOUT
+   ========================================================================== */
+
+.page {
+    min-height: calc(100vh - 64px);
+    display: grid;
+    place-items: center;
+    padding: 32px;
+}
+
+.card {
+    width: 100%;
+    max-width: 640px;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 40px 36px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+}
+
+.card-title {
+    font-family: 'Anton', sans-serif;
+    text-align: center;
+    font-size: 54px;
+    letter-spacing: 1px;
+    margin-bottom: 24px;
+    color: #222;
+}
+
+/* ==========================================================================
+   FORMS
+   ========================================================================== */
+
+.form {
+    display: grid;
+    gap: 18px;
+}
+
+.form-row {
+    display: grid;
+    gap: 8px;
+}
+
+.label {
+    font-family: 'Anton', sans-serif;
+    color: #6b6e72;
+    letter-spacing: 1px;
+}
+
+.input,
+.select {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 2px solid #e6e7e9;
+    background: #f4f5f6;
+    font-size: 16px;
+    color: #222;
+}
+
+.input:focus,
+.select:focus {
+    outline: none;
+    border-color: #00d26a;
+    background: #fff;
+}
+
+/* ==========================================================================
+   LANDING PAGE
+   ========================================================================== */
+
+.hero {
+    text-align: center;
+}
+
+.hero-title {
+    font-family: 'Anton', sans-serif;
+    color: #fff;
+    font-size: 86px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+}
+
+.hero-cta {
+    margin: 0 auto;
+    display: inline-block;
+}
+
+/* ==========================================================================
+   FEED PAGE
+   ========================================================================== */
+
+.feed-wrap {
+    width: 100%;
+    max-width: 1100px;
+    display: grid;
+    gap: 20px;
+}
+
+.section-title {
+    font-family: 'Anton', sans-serif;
+    color: #fff;
+    font-size: 32px;
+    letter-spacing: 1px;
+}
+
+.run-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+    display: grid;
+    gap: 10px;
+}
+
+.run-top {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #e6e7e9;
+    display: grid;
+    place-items: center;
+    color: #6b6e72;
+}
+
+.run-name {
+    font-family: 'Chokana', 'Anton', sans-serif;
+    font-size: 24px;
+    color: #222;
+}
+
+.run-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+
+.run-cell {
+    background: #f7f8f9;
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+}
+
+.run-key {
+    color: #6b6e72;
+    font-weight: 600;
+}
+
+.run-val {
+    color: #111;
+    font-weight: 800;
+    font-size: 20px;
+}
+
+.add-run-card {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 24px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
+}
+
+.add-grid {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: 1fr 1fr;
+}
+
+.full {
+    grid-column: 1 / -1;
+}
+
+/* ==========================================================================
+   PROFILE PAGE
+   ========================================================================== */
+
+.profile-card {
+    text-align: center;
+}
+
+.profile-photo {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: #00d26a;
+    color: #111;
+    display: grid;
+    place-items: center;
+    font-size: 42px;
+    margin: 0 auto 18px;
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-photo::after {
+    content: 'EDIT PHOTO';
+    position: absolute;
+    inset: auto 0 0 0;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    padding: 8px 0;
+    transform: translateY(100%);
+    transition: transform 0.2s ease;
+    font-family: 'Anton', sans-serif;
+    letter-spacing: 1px;
+}
+
+.profile-photo:hover::after {
+    transform: translateY(0);
+}
+
+.profile-name {
+    font-family: 'Chokana', 'Anton', sans-serif;
+    color: #222;
+    font-size: 36px;
+    margin-bottom: 14px;
+}
+
+.profile-stats {
+    display: grid;
+    gap: 10px;
+    text-align: left;
+    max-width: 360px;
+    margin: 0 auto 18px;
+}
+
+.stat-row {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    font-size: 18px;
+}
+
+.stat-key {
+    color: #6b6e72;
+    font-weight: 700;
+}
+
+.stat-val {
+    color: #111;
+    font-weight: 800;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 48px;
+    }
+    
+    .run-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .add-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+

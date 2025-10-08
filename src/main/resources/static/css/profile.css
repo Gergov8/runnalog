@@ -1,0 +1,219 @@
+/* ==========================================================================
+   PROFILE PAGE LAYOUT
+   ========================================================================== */
+
+.profile-page {
+    min-height: calc(100vh - 64px);
+}
+
+.profile-container {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr 320px; /* left rail, main, right rail */
+    gap: 24px;
+}
+
+/* ==========================================================================
+   CARDS
+   ========================================================================== */
+
+.p-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
+    padding: 22px;
+}
+
+/* ==========================================================================
+   LEFT RAIL: LATEST RUNS / SUBSCRIPTION HISTORY
+   ========================================================================== */
+
+.rail-title {
+    font-family: 'Anton', sans-serif;
+    color: #222;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+}
+
+.rail-list {
+    display: grid;
+    gap: 10px;
+}
+
+.rail-item {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+.rail-item .icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e9eaee;
+    display: grid;
+    place-items: center;
+    color: #6b6e72;
+}
+
+/* ==========================================================================
+   MAIN PROFILE CARD
+   ========================================================================== */
+
+.profile-card {
+    text-align: center;
+}
+
+.profile-card .avatar-lg {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 14px;
+    background: #e9eaee;
+}
+
+.profile-card .avatar-lg img {
+    width: 140px;
+    height: 140px;
+    object-fit: cover;
+    display: block;
+}
+
+.profile-username {
+    font-family: 'Chokana', 'Anton', sans-serif;
+    color: #222;
+    font-size: 28px;
+}
+
+.profile-status {
+    margin-top: 6px;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+.active-profile {
+    backdrop-filter: blur(8px);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    background-color: #e0f7e9;
+    color: #2e7d32;
+    border: 1px solid rgba(84, 227, 54, 0.6);
+    box-shadow: 0 4px 8px rgba(0, 153, 51, 0.15);
+}
+
+.inactive-profile {
+    background-color: #fbe9e7;
+    color: #c62828;  letter-spacing: 0.03em;
+    border: 1px solid rgba(255, 103, 103, 0.6);
+    box-shadow: 0 4px 8px rgba(255, 103, 103, 0.2);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.user-info {
+    display: grid;
+    gap: 6px;
+    margin: 14px 0;
+    color: #6b6e72;
+}
+
+.user-info p {
+    margin: 0;
+}
+
+.profile-stats {
+    display: grid;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+.profile-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+/* ==========================================================================
+   RIGHT RAIL: SUBSCRIPTIONS
+   ========================================================================== */
+
+.subs-list {
+    display: grid;
+    gap: 10px;
+}
+
+.subs-item {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+.subs-item .icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e9eaee;
+    display: grid;
+    place-items: center;
+    color: #6b6e72;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    margin: 20px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.styled-table thead {
+    background: #00d26a;
+);
+    color: rgba(0, 0, 0, 0.75);
+    text-transform: uppercase;
+    font-weight: 200;
+}
+
+.styled-table thead th {
+    padding: 12px;
+    border-bottom: 2px solid #e0e0e0;
+}
+
+.styled-table tbody td {
+    padding: 12px;
+    color: #333;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
