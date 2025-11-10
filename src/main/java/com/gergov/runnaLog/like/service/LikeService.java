@@ -66,4 +66,9 @@ public class LikeService {
         Optional<Run> runOpt = runRepository.findById(runId);
         return runOpt.map(run -> likeRepository.findByRun(run).size()).orElse(0);
     }
+
+    public boolean isRunLikedByUser(User user, Run run) {
+        return likeRepository.existsByUserAndRun(user, run);
+    }
+
 }

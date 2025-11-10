@@ -4,9 +4,51 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Run - RUNNALOG</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+
+    <!-- TailwindCSS CDN (jit) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            DEFAULT: '#D4AF37',
+                            soft: '#E6C967',
+                            light: '#F5E7C5'
+                        }
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mont: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        roboCond: ['Roboto Condensed', 'ui-sans-serif', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        glow: '0 0 0 2px rgba(212,175,55,0.35), 0 8px 30px rgba(0,0,0,0.35)',
+                        gold: '0 0 20px rgba(212,175,55,0.4)'
+                    },
+                    backdropBlur: {
+                        xs: '2px'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" th:href="@{/css/add-run.css}">
 </head>
 <body>
+<!-- Background elements -->
+<div class="bg-layer">
+    <img src="/images/background.png" alt="Background" />
+</div>
+
+<!-- Header -->
 <header class="header">
     <div class="logo"><a href="/feed">RUNNALOG</a></div>
     <div class="header-actions">
@@ -14,40 +56,50 @@
     </div>
 </header>
 
+<!-- Main content -->
 <main class="page">
     <section class="card">
         <h1 class="card-title">ADD RUN</h1>
-        <form class="form" method="post" onsubmit="return validateRunForm()">
+        <form class="form" th:method="post" th:action="@{'/runs/' + ${userId} + '/add'}" th:object="${createRunRequest}">
 
             <div class="form-row">
                 <label class="label" for="distance">DISTANCE (KM):</label>
-                <input class="input" id="distance" name="distance" type="number" min="1" step="0.01" required>
+                <input class="input" id="distance" name="distance" type="number" min="1" step="0.01" th:field="*{distance}" placeholder="Enter distance in kilometers" required>
+                <p class="alert-warning" th:if="${#fields.hasErrors('distance')}" th:errors="*{distance}">Error message</p>
             </div>
 
             <div class="form-row">
                 <label class="label">DURATION:</label>
-                <div style="display:flex;gap:10px;">
-                    <input class="input" id="hours" name="hours" type="number" min="0" max="24" placeholder="HH" required>
-                    <input class="input" id="minutes" name="minutes" type="number" min="0" max="59" placeholder="MM" required>
-                    <input class="input" id="seconds" name="seconds" type="number" min="0" max="59" placeholder="SS" required>
+                <div class="duration-group">
+                    <input class="input duration-input" id="hours" type="number" placeholder="HH" th:field="*{durationHours}" min="0" max="23" required>
+                    <span class="duration-separator">:</span>
+                    <input class="input duration-input" id="minutes" type="number" placeholder="MM" th:field="*{durationMinutes}" min="0" max="59" required>
+                    <span class="duration-separator">:</span>
+                    <input class="input duration-input" id="seconds" type="number" placeholder="SS" th:field="*{durationSeconds}" min="0" max="59" required>
+                </div>
+                <div class="error-group">
+                    <p class="alert-warning" th:if="${#fields.hasErrors('durationHours')}" th:errors="*{durationHours}">Error message</p>
+                    <p class="alert-warning" th:if="${#fields.hasErrors('durationMinutes')}" th:errors="*{durationMinutes}">Error message</p>
+                    <p class="alert-warning" th:if="${#fields.hasErrors('durationSeconds')}" th:errors="*{durationSeconds}">Error message</p>
                 </div>
             </div>
 
             <div class="form-row">
                 <label class="label" for="title">TITLE:</label>
-                <input class="input" id="title" name="title" type="text" required>
+                <input class="input" id="title" name="title" type="text" th:field="*{title}" placeholder="Enter run title" required>
+                <p class="alert-warning" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Error message</p>
             </div>
 
             <div class="form-row">
                 <label class="label" for="description">DESCRIPTION (OPTIONAL):</label>
-                <textarea class="input" id="description" name="description" rows="3"></textarea>
+                <textarea class="input" id="description" name="description" rows="3" th:field="*{description}" placeholder="Add a description for your run..."></textarea>
+                <p class="alert-warning" th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Error message</p>
             </div>
 
             <div class="form-row">
                 <label class="label" for="visibility">VISIBILITY:</label>
-                <select class="select" id="visibility" name="visibility">
-                    <option value="PUBLIC">Public</option>
-                    <option value="PRIVATE">Private</option>
+                <select class="select" id="visibility" name="visibility" th:field="*{visibility}">
+                    <option value="PUBLIC" th:each="runVisibility : ${T(com.gergov.runnaLog.run.model.RunVisibility).values()}" th:value="${runVisibility}" th:text="${runVisibility.getDisplayName()}">Public</option>
                 </select>
             </div>
 
@@ -57,22 +109,44 @@
 </main>
 
 <script>
-    function validateRunForm() {
-        let distance = parseFloat(document.getElementById('distance').value);
-        let hh = parseInt(document.getElementById('hours').value);
-        let mm = parseInt(document.getElementById('minutes').value);
-        let ss = parseInt(document.getElementById('seconds').value);
+    // Enhanced form validation with visual feedback
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const inputs = document.querySelectorAll('.input, .select');
 
-        if (distance < 1) {
-            alert("Distance must be at least 1 km.");
-            return false;
+        // Add focus/blur effects
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Real-time validation for duration fields
+        const hoursInput = document.getElementById('hours');
+        const minutesInput = document.getElementById('minutes');
+        const secondsInput = document.getElementById('seconds');
+
+        function validateDurationField(input, max) {
+            input.addEventListener('input', function() {
+                const value = parseInt(this.value);
+                if (value > max) {
+                    this.style.borderColor = '#ff6b6b';
+                    this.style.boxShadow = '0 0 0 3px rgba(255, 107, 107, 0.2)';
+                } else {
+                    this.style.borderColor = '';
+                    this.style.boxShadow = '';
+                }
+            });
         }
-        if (hh > 24 || mm > 59 || ss > 59) {
-            alert("Please enter a valid duration (max 24h, 59m, 59s).");
-            return false;
-        }
-        return true;
-    }
+
+        if (hoursInput) validateDurationField(hoursInput, 23);
+        if (minutesInput) validateDurationField(minutesInput, 59);
+        if (secondsInput) validateDurationField(secondsInput, 59);
+    });
 </script>
 </body>
 </html>

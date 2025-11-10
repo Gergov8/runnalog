@@ -25,6 +25,16 @@ public class Run {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Transient
+    private int likesCount;
+
+    @Transient
+    private boolean likedByCurrentUser;
+
+    @Transient
+    private double score;
+
+
     @Column(nullable = false)
     private Double distance;
 

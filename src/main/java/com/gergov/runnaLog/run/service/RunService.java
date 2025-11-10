@@ -1,10 +1,12 @@
 package com.gergov.runnaLog.run.service;
 
+import com.gergov.runnaLog.like.service.LikeService;
 import com.gergov.runnaLog.run.model.Run;
 import com.gergov.runnaLog.run.model.RunVisibility;
 import com.gergov.runnaLog.run.repository.RunRepository;
 import com.gergov.runnaLog.stats.service.StatsService;
 import com.gergov.runnaLog.user.model.User;
+import com.gergov.runnaLog.user.repository.UserRepository;
 import com.gergov.runnaLog.web.dto.CreateRunRequest;
 import com.gergov.runnaLog.web.dto.RunResponseDto;
 import jakarta.transaction.Transactional;
@@ -25,17 +27,23 @@ public class RunService {
 
     private final RunRepository runRepository;
     private final StatsService statsService;
+    private final LikeService likeService;
+    private final UserRepository userRepository;
 
 
     @Autowired
-    public RunService(RunRepository runRepository, StatsService statsService) {
+    public RunService(RunRepository runRepository, StatsService statsService, LikeService likeService, UserRepository userRepository) {
         this.runRepository = runRepository;
         this.statsService = statsService;
+        this.likeService = likeService;
+        this.userRepository = userRepository;
     }
 
     public Run createRun(CreateRunRequest createRunRequest, User user) {
 
-        Duration duration = parseDuration(createRunRequest.getDuration());
+        Duration duration = Duration.ofHours(createRunRequest.getDurationHours())
+                .plusMinutes(createRunRequest.getDurationMinutes())
+                .plusSeconds(createRunRequest.getDurationSeconds());
 
         // Смята колко секунди са изминали за бягането
         long totalSeconds = duration.getSeconds();
@@ -154,13 +162,40 @@ public class RunService {
     public List<RunResponseDto> getFeed(User currentUser) {
         return getVisibleRuns(currentUser).stream()
                 .map(run -> new RunResponseDto(
+                        run.getId(), // this was missing
                         run.getUser().getUsername(),
                         run.getDistance(),
                         formatDuration(run.getDuration()),
-                        run.getPace()
+                        run.getPace(),
+                        run.getTitle(),
+                        run.getLikes().size(), // likesCount
+                        run.getLikes().contains(currentUser) // likedByCurrentUser
                 ))
                 .toList();
     }
+
+
+
+//    public List<Run> getFeedWithLikes(User currentUser) {
+//        List<Run> runs = getVisibleRuns(currentUser);
+//
+//        for (Run run : runs) {
+//            int likes = likeService.getLikesCount(run.getId());
+//            run.setLikesCount(likes);
+//
+//            User user = userRepository.findById(currentUser.getId()).orElseThrow();
+//            boolean likedByUser = likeService.isRunLikedByUser(user, run);
+//            run.setLikedByCurrentUser(likedByUser);
+//
+//            // Example scoring formula: likes + recency in hours
+//            long hoursAgo = java.time.Duration.between(run.getCreatedOn(), java.time.LocalDateTime.now()).toHours();
+//            run.setScore(likes * 2.0 + Math.max(0, 100 - hoursAgo));
+//        }
+//
+//        // Sort by score descending
+//        runs.sort((r1, r2) -> Double.compare(r2.getScore(), r1.getScore()));
+//        return runs;
+//    }
 
     private String formatDuration(Duration duration) {
         long hours = duration.toHours();
@@ -171,5 +206,9 @@ public class RunService {
                 : String.format("%02d:%02d", minutes, seconds);
     }
 
+
+    public List<Run> getRunsByUser(User user) {
+        return runRepository.findByUser(user);
+    }
 
 }

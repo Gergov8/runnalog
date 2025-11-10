@@ -4,89 +4,152 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subscriptions - RUNNALOG</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <style>
-        .plans {
-            display: grid;
-            gap: 20px;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            margin-top: 20px;
+
+    <!-- TailwindCSS CDN (jit) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            DEFAULT: '#D4AF37',
+                            soft: '#E6C967',
+                            light: '#F5E7C5'
+                        }
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mont: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        roboCond: ['Roboto Condensed', 'ui-sans-serif', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        glow: '0 0 0 2px rgba(212,175,55,0.35), 0 8px 30px rgba(0,0,0,0.35)',
+                        gold: '0 0 20px rgba(212,175,55,0.4)'
+                    },
+                    backdropBlur: {
+                        xs: '2px'
+                    }
+                }
+            }
         }
-        .plan-card {
-            background: #fff;
-            border-radius: 12px;
-            padding: 24px;
-            text-align: center;
-            box-shadow: 0 8px 28px rgba(0,0,0,0.12);
-        }
-        .plan-title {
-            font-family: 'Anton', sans-serif;
-            font-size: 28px;
-            margin-bottom: 10px;
-            color: #222;
-        }
-        .plan-price {
-            font-size: 24px;
-            font-weight: bold;
-            color: #00d26a;
-            margin-bottom: 16px;
-        }
-        .plan-features {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            color: #6b6e72;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-        .plan-features li {
-            margin: 6px 0;
-        }
-    </style>
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" th:href="@{/css/subscriptions.css}">
+
 </head>
 <body>
+<!-- Background elements -->
+<div class="bg-layer">
+    <img src="/images/background.png" alt="Background" />
+</div>
+
+<!-- Floating particles -->
+<div class="particles">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<!-- Header -->
 <header class="header">
     <div class="logo"><a href="/feed">RUNNALOG</a></div>
     <div class="header-actions">
+        <div class="strides-balance-header">
+            <span class="strides-amount-header" th:text="${stats.strides}">12,500</span>
+            <span class="strides-label-header">Strides</span>
+        </div>
         <a class="btn btn-primary" href="/feed">FEED</a>
     </div>
 </header>
 
+<!-- Main content -->
 <main class="page">
-    <section class="feed-wrap">
-        <h1 class="section-title">Choose Your Plan</h1>
+    <section class="card">
+        <h1 class="card-title">Choose Your Plan</h1>
         <div class="plans">
-            <div class="plan-card">
-                <div class="plan-title">Basic</div>
+            <!-- Recreational Plan -->
+            <form th:action="@{/subscriptions/purchase}" method="post" class="plan-card">
+                <input type="hidden" name="planType" value="RECREATIONAL">
+                <div class="plan-title">Recreational</div>
                 <div class="plan-price">Free</div>
                 <ul class="plan-features">
+                    <li>Default Plan</li>
                     <li>Track unlimited runs</li>
-                    <li>Basic stats</li>
+                    <li>Basic statistics</li>
+                    <li>Community access</li>
                 </ul>
-                <button class="btn btn-primary">Select</button>
-            </div>
-            <div class="plan-card">
-                <div class="plan-title">Pro</div>
-                <div class="plan-price">€9.99 / month</div>
+                <button class="btn btn-outline" type="submit">Current Plan</button>
+            </form>
+
+            <!-- Competitive Plan -->
+            <form th:action="@{/subscriptions/purchase}" method="post" class="plan-card">
+                <input type="hidden" name="planType" value="COMPETITIVE">
+                <div class="plan-title">Competitive</div>
+                <div class="plan-price">2500 STR / month</div>
                 <ul class="plan-features">
                     <li>Advanced analytics</li>
                     <li>Custom training plans</li>
-                    <li>No ads</li>
+                    <li>No advertisements</li>
+                    <li>Priority support</li>
+                    <li>Export capabilities</li>
                 </ul>
-                <button class="btn btn-primary">Subscribe</button>
-            </div>
-            <div class="plan-card">
-                <div class="plan-title">Ultimate</div>
-                <div class="plan-price">€19.99 / month</div>
+                <button class="btn btn-primary" type="submit">Upgrade Now</button>
+            </form>
+
+            <!-- Elite Plan -->
+            <form th:action="@{/subscriptions/purchase}" method="post" class="plan-card">
+                <input type="hidden" name="planType" value="ELITE">
+                <div class="plan-title">Elite</div>
+                <div class="plan-price">6000 STR / month</div>
                 <ul class="plan-features">
-                    <li>Everything in Pro</li>
-                    <li>1-on-1 coaching</li>
+                    <li>Everything in Competitive</li>
+                    <li>1-on-1 coaching sessions</li>
                     <li>Exclusive events</li>
+                    <li>Personalized gear recommendations</li>
+                    <li>Early access to features</li>
                 </ul>
-                <button class="btn btn-primary">Subscribe</button>
-            </div>
+                <button class="btn btn-primary" type="submit">Go Elite</button>
+            </form>
         </div>
     </section>
 </main>
+
+<script>
+    // Add subtle animations to plan cards
+    document.addEventListener('DOMContentLoaded', function() {
+        const planCards = document.querySelectorAll('.plan-card');
+
+        planCards.forEach((card, index) => {
+            // Add staggered animation
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 200);
+        });
+
+        // Add confirmation for subscription
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            form.addEventListener('submit', function(e) {
+                const planType = this.querySelector('input[name="planType"]').value;
+                if (planType !== 'RECREATIONAL') {
+                    if (!confirm(`Are you sure you want to subscribe to the ${planType} plan?`)) {
+                        e.preventDefault();
+                    }
+                }
+            });
+        });
+    });
+</script>
 </body>
 </html>

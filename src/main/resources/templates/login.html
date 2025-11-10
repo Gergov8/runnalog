@@ -1,35 +1,134 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - RUNNALOG</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-</head>
-<body>
-    <header class="header">
-        <div class="logo"><a href="/">RUNNALOG</a></div>
-        <div class="header-actions">
-            <a class="btn btn-primary" href="/register">REGISTER</a>
-        </div>
-    </header>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - RunnaLog</title>
 
-    <main class="page">
-        <section class="card">
-            <h1 class="card-title">LOGIN</h1>
-            <form class="form" method="post">
-                <div class="form-row">
-                    <label class="label" for="username">USERNAME OR EMAIL:</label>
-                    <input class="input" id="username" type="text" required>
+    <!-- TailwindCSS CDN (jit) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            DEFAULT: '#D4AF37',
+                            soft: '#E6C967',
+                            light: '#F5E7C5'
+                        }
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mont: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        roboCond: ['Roboto Condensed', 'ui-sans-serif', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        glow: '0 0 0 2px rgba(212,175,55,0.35), 0 8px 30px rgba(0,0,0,0.35)',
+                        gold: '0 0 20px rgba(212,175,55,0.4)'
+                    },
+                    backdropBlur: {
+                        xs: '2px'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css"/>
+    <link rel="stylesheet" href="/css/auth.css" />
+</head>
+<body class="min-h-screen overflow-x-hidden bg-black text-white font-open-sans">
+    <!-- Corner vignette effect -->
+    <div class="corner-veil"></div>
+    
+    <!-- Floating particles -->
+    <div class="particles">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    
+    <!-- Parallax background layer -->
+    <div id="bg-layer" class="fixed inset-0 -z-10">
+        <img src="/images/background.png" alt="Background" class="w-full h-full object-cover will-change-transform" />
+        <div class="absolute inset-0 bg-black/50"></div>
+    </div>
+
+    <!-- Auth Container -->
+    <div class="auth-container">
+        <!-- Close button -->
+        <a href="/" class="close-btn" aria-label="Close">×</a>
+        
+        <div class="auth-content">
+            <header class="auth-header">
+                <h1 class="auth-title">Welcome Back</h1>
+                <p class="auth-subtitle">Sign in to continue your running journey</p>
+            </header>
+
+            <form class="auth-form" th:action="@{/login}" th:object="${loginRequest}" method="post">
+                <div class="form-group">
+                    <label for="username" class="form-label">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        th:field="*{username}"
+                        class="form-input" 
+                        placeholder="Enter your username"
+                        required
+                    />
+                    <div th:if="${#fields.hasErrors('username')}" class="error-message">
+                        <span th:errors="*{username}"></span>
+                    </div>
                 </div>
-                <div class="form-row">
-                    <label class="label" for="password">PASSWORD:</label>
-                    <input class="input" id="password" type="password" required>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        th:field="*{password}"
+                        class="form-input" 
+                        placeholder="Enter your password"
+                        required
+                    />
+                    <div th:if="${#fields.hasErrors('password')}" class="error-message">
+                        <span th:errors="*{password}"></span>
+                    </div>
                 </div>
-                <button class="btn btn-primary" type="submit">LOGIN</button>
+
+                <div class="auth-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        Sign In
+                    </button>
+                </div>
             </form>
-        </section>
-    </main>
+
+            <div class="auth-links">
+                <a href="/register" class="auth-link">Don't have an account? Register</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right: Athlete image with parallax -->
+    <section class="athlete-section">
+        <div id="athlete-wrap" class="athlete-container">
+            <img id="athlete" src="/images/kipchoge.png" alt="Athlete" class="athlete-image" />
+            <img id="athlete-rudisha" src="/images/rudisha.png" alt="Athlete Kilian" />
+        </div>
+    </section>
+
+    <footer class="site-footer" role="contentinfo">
+        <p>© 2025 RunnaLog - Built with Spring Boot & Thymeleaf</p>
+    </footer>
+
+    <script src="/js/script.js"></script>
+    <script src="/js/triangle.js"></script>
 </body>
 </html>
-

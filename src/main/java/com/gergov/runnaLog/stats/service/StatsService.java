@@ -45,7 +45,7 @@ public class StatsService {
         Stats stats = user.getStats();
         stats.setTotalRuns(stats.getTotalRuns() + 1);
         stats.setTotalDistance(stats.getTotalDistance() + distance);
-        stats.setTotalDuration((int) (stats.getTotalDuration() + totalSeconds));
+        stats.setTotalDuration((int) (stats.getTotalDuration() + totalSeconds/60));
         stats.setLastActivity(LocalDateTime.now());
 
         updatePersonalBests(stats, distance, pace);

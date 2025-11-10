@@ -3,18 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RUNNALOG - Grounded in Motion</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
-    <link rel="stylesheet" th:href="@{/css/subscription-history.css}">
+    <title>Subscription History - RUNNALOG</title>
+
+    <!-- TailwindCSS CDN (jit) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            DEFAULT: '#D4AF37',
+                            soft: '#E6C967',
+                            light: '#F5E7C5'
+                        }
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mont: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        roboCond: ['Roboto Condensed', 'ui-sans-serif', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        glow: '0 0 0 2px rgba(212,175,55,0.35), 0 8px 30px rgba(0,0,0,0.35)',
+                        gold: '0 0 20px rgba(212,175,55,0.4)'
+                    },
+                    backdropBlur: {
+                        xs: '2px'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" th:href="@{/css/tables.css}">
+
 </head>
 <body>
+<!-- Background elements -->
+<div class="bg-layer">
+    <img src="/images/background.png" alt="Background" />
+</div>
+
+<!-- Floating particles -->
+<div class="particles">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+</div>
 
 <!-- Header -->
 <div class="header">
     <div class="logo">RUNNALOG</div>
     <div class="header-actions">
         <a href="/feed" class="btn btn-outline">Feed</a>
-        <a th:href="@{'/users/' + ${user.id} + '/profile'}" class="btn btn-primary">Profile</a>
+        <a th:href="@{'/users/profile'}" class="btn btn-primary">Profile</a>
     </div>
 </div>
 
@@ -23,7 +70,15 @@
     <div class="card">
         <div class="card-title">Subscription History</div>
 
-        <table class="subscription-table">
+        <!-- Empty state (optional) -->
+        <div th:if="${user.subscriptions.empty}" class="empty-state">
+            <div class="icon">📊</div>
+            <h3>No Subscriptions Yet</h3>
+            <p>You haven't subscribed to any plans yet.</p>
+            <a href="/subscriptions" class="btn btn-primary" style="margin-top: 1rem;">Browse Plans</a>
+        </div>
+
+        <table class="subscription-table" th:unless="${user.subscriptions.empty}">
             <thead>
             <tr>
                 <th>Id</th>
@@ -36,23 +91,41 @@
             </tr>
             </thead>
             <tbody>
-                <tr th:each="subscription : ${user.subscriptions}">
-                    <td data-label="Id" th:text="${subscription.id}">1</td>
-                    <td data-label="Subscription Type" th:text="${subscription.type}">RECREATIONAL (0 strides)</td>
-                    <td data-label="Status">
-                        <p style="color: #00d26a; font-weight: 700;" th:if="${subscription.status.name() == 'ACTIVE'}" class="status active">ACTIVE</p>
-                        <p style="color: #1565c0; font-weight: 700;" th:if="${subscription.status.name() == 'COMPLETED'}" class="status completed">COMPLETED</p>
-                        <p style="color: #c62828; font-weight: 700;" th:if="${subscription.status.name() == 'TERMINATED'}" class="status terminated">TERMINATED</p>
-                    </td>
-                    <td data-label="Period" th:text="${subscription.period}">MONTHLY</td>
-                    <td data-label="Price" th:text="${subscription.price}">0</td>
-                    <td data-label="Effective From" th:text="${#temporals.format(subscription.createdOn, 'dd MMM YYYY HH:mm')}">2025-01-01</td>
-                    <td data-label="Effective To" th:text="${#temporals.format(subscription.expiryOn, 'dd MMM YYYY HH:mm')}">2025-01-31</td>
-                </tr>
+            <tr th:each="subscription : ${user.subscriptions}">
+                <td data-label="Id" th:text="${subscription.id}">1</td>
+                <td data-label="Subscription Type" th:text="${subscription.type.getDisplayName()}">RECREATIONAL (0 strides)</td>
+                <td data-label="Status">
+                    <span th:if="${subscription.status.name() == 'ACTIVE'}" class="status active">ACTIVE</span>
+                    <span th:if="${subscription.status.name() == 'COMPLETED'}" class="status completed">COMPLETED</span>
+                    <span th:if="${subscription.status.name() == 'TERMINATED'}" class="status terminated">TERMINATED</span>
+                </td>
+                <td data-label="Period" th:text="${subscription.period}">MONTHLY</td>
+                <td data-label="Price" th:text="${subscription.price}">0</td>
+                <td data-label="Effective From" th:text="${#temporals.format(subscription.createdOn, 'dd MMM YYYY HH:mm')}">2025-01-01</td>
+                <td data-label="Effective To" th:text="${#temporals.format(subscription.expiryOn, 'dd MMM YYYY HH:mm')}">2025-01-31</td>
+            </tr>
             </tbody>
         </table>
     </div>
 </div>
 
+<script>
+    // Add subtle animations to table rows
+    document.addEventListener('DOMContentLoaded', function() {
+        const tableRows = document.querySelectorAll('.subscription-table tbody tr');
+
+        tableRows.forEach((row, index) => {
+            // Add staggered animation
+            row.style.opacity = '0';
+            row.style.transform = 'translateY(10px)';
+
+            setTimeout(() => {
+                row.style.transition = 'all 0.3s ease';
+                row.style.opacity = '1';
+                row.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
+</script>
 </body>
 </html>

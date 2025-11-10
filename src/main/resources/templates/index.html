@@ -1,35 +1,123 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RUNNALOG - Grounded in Motion</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RunnaLog</title>
+
+    <!-- TailwindCSS CDN (jit) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            DEFAULT: '#D4AF37',
+                            soft: '#E6C967',
+                            light: '#F5E7C5'
+                        }
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mont: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        roboCond: ['Roboto Condensed', 'ui-sans-serif', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        glow: '0 0 0 2px rgba(212,175,55,0.35), 0 8px 30px rgba(0,0,0,0.35)',
+                        gold: '0 0 20px rgba(212,175,55,0.4)'
+                    },
+                    backdropBlur: {
+                        xs: '2px'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/css/style.css" />
 </head>
-<body>
-    <header class="header">
-        <div class="logo">RUNNALOG</div>
-        <div class="header-actions">
-            <a class="btn btn-primary" href="/register">REGISTER</a>
-            <a class="btn btn-primary" href="/login">LOGIN</a>
+<body class="min-h-screen overflow-x-hidden bg-black text-white font-open-sans">
+<!--    &lt;!&ndash; Corner vignette effect &ndash;&gt;-->
+<!--    <div class="corner-veil"></div>-->
+
+
+
+<!-- Floating particles-->
+        <div class="particles">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+    </div>
+
+    <!-- Parallax background layer -->
+    <div id="bg-layer" class="fixed inset-0 -z-10">
+        <img src="/images/background.png" alt="Background" class="w-full h-full object-cover will-change-transform" />
+        <div class="absolute inset-0 bg-black/50"></div>
+    </div>
+
+    <main class="content" role="main" aria-label="RunnaLog Landing">
+        <header class="hero-head">
+            <h1>
+                <span>Runna</span><span>Log</span>
+            </h1>
+
+            <p class="lead">
+                Track every step. Log your progress. Stay grounded in motion —
+                from your first run to your personal best, <strong>RunnaLog</strong> keeps your journey alive
+                with every kilometer you conquer.
+            </p>
+
+            <nav class="btns" aria-label="Primary">
+                <a href="/register" class="btn btn-primary">Create Account</a>
+                <a href="/login" class="btn btn-secondary">Login</a>
+            </nav>
+        </header>
+
+        <div class="steps">
+            <div class="step">
+                <div class="bullet">1</div>
+                <div class="step-body">
+                    <p class="step-title">Create your account</p>
+                    <p class="step-sub">Start your running journey with RunnaLog</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="bullet">2</div>
+                <div class="step-body">
+                    <p class="step-title">Post your runs</p>
+                    <p class="step-sub">Post your runs, track your achievements and embrace the hard training</p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="bullet">3</div>
+                <div class="step-body">
+                    <p class="step-title">Like & comment on others' runs</p>
+                    <p class="step-sub">Like and comment on other people's runs</p>
+                </div>
+            </div>
         </div>
-    </header>
-
-    <main class="page">
-        <section class="hero">
-            <h1 class="hero-title">GROUNDED IN MOTION</h1>
-            <a class="btn btn-primary hero-cta" href="/register">GET STARTED</a>
-        </section>
     </main>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Index</title>
-</head>
-<body>
 
+    <!-- Right: Athlete image with parallax -->
+    <section class="athlete-section">
+        <div id="athlete-wrap" class="athlete-container">
+            <img id="athlete" src="/images/athlete.png" alt="Athlete" class="athlete-image" />
+        </div>
+    </section>
+
+    <footer class="site-footer" role="contentinfo">
+        <p>© 2025 RunnaLog - Built with Spring Boot & Thymeleaf</p>
+    </footer>
+
+    <script src="/js/script.js"></script>
+    <script src="/js/triangle.js"></script>
 </body>
 </html>
+
+

@@ -4,40 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Profile - RUNNALOG</title>
+
+    <!-- TailwindCSS CDN (jit) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            DEFAULT: '#D4AF37',
+                            soft: '#E6C967',
+                            light: '#F5E7C5'
+                        }
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mont: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        roboCond: ['Roboto Condensed', 'ui-sans-serif', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        glow: '0 0 0 2px rgba(212,175,55,0.35), 0 8px 30px rgba(0,0,0,0.35)',
+                        gold: '0 0 20px rgba(212,175,55,0.4)'
+                    },
+                    backdropBlur: {
+                        xs: '2px'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/edit-profile.css}">
 </head>
-<body>
+<body class="min-h-screen overflow-x-hidden bg-black text-white font-open-sans">
+<!-- Background elements -->
+<div class="bg-layer">
+    <img src="/images/background.png" alt="Background" />
+</div>
+
+<!-- Floating particles -->
+<div class="particles">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<!-- Header -->
 <header class="header">
     <div class="logo"><a href="/feed">RUNNALOG</a></div>
     <div class="header-actions">
-        <a class="btn btn-primary" th:href="@{'/users/' + ${user.id} + '/profile'}">PROFILE</a>
+        <a class="btn btn-primary" th:href="@{'/users/profile'}">PROFILE</a>
     </div>
 </header>
 
+<!-- Main content -->
 <main class="page">
     <section class="card">
         <h1 class="card-title">EDIT PROFILE</h1>
-        <form th:action="@{'/users/' + ${user.id} + '/profile'}"
-              th:object="${user}"
+        <form th:action="@{'/users/profile'}"
+              th:object="${editProfileRequest}"
               class="form"
-              method="post">
+              th:method="post">
             <div class="form-row">
                 <label class="label" for="firstName">FIRST NAME:</label>
-                <input class="input" id="firstName" th:field="*{firstName}" type="text">
+                <input class="input" id="firstName" th:field="*{firstName}" type="text" placeholder="Enter your first name">
             </div>
             <div class="form-row">
                 <label class="label" for="lastname">LAST NAME:</label>
-                <input class="input" id="lastname" th:field="*{lastName}" type="text" >
+                <input class="input" id="lastname" th:field="*{lastName}" type="text" placeholder="Enter your last name">
             </div>
             <div class="form-row">
                 <label class="label" for="profilePicture">PROFILE PICTURE URL:</label>
-                <input class="input" id="profilePicture" name="profilePicture" type="url" placeholder="https://..." th:field="*{profilePicture}">
+                <input class="input" id="profilePicture" name="profilePicture" type="url" placeholder="https://example.com/photo.jpg" th:field="*{profilePicture}">
             </div>
             <button class="btn btn-primary" type="submit">
-                    SAVE CHANGES
+                SAVE CHANGES
             </button>
         </form>
     </section>
 </main>
+
+<script>
+
+    // Add subtle animation to form elements on focus
+    document.querySelectorAll('.input').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'translateY(-2px)';
+        });
+
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'translateY(0)';
+        });
+    });
+</script>
 </body>
 </html>

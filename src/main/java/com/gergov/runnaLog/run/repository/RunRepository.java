@@ -18,6 +18,8 @@ public interface RunRepository extends JpaRepository<Run, UUID> {
 
     List<Run> findByVisibilityOrderByCreatedOnDesc(RunVisibility visibility);
 
-    @Query("SELECT r FROM Run r WHERE r.visibility = 'PUBLIC' OR r.user = :user ORDER BY r.createdOn DESC")
+    @Query("SELECT r FROM Run r WHERE r.visibility = 'PUBLIC' AND r.user <> :user ORDER BY RAND()")
     List<Run> findVisibleRunsForUser(@Param("user") User user);
+
+    List<Run> findByUser(User user);
 }
