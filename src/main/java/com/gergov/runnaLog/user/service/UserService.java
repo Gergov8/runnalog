@@ -1,17 +1,22 @@
 package com.gergov.runnaLog.user.service;
 
+import com.gergov.runnaLog.event.SuccessfulRegistrationEvent;
+import com.gergov.runnaLog.run.repository.RunRepository;
 import com.gergov.runnaLog.security.UserData;
 import com.gergov.runnaLog.stats.service.StatsService;
 import com.gergov.runnaLog.subscription.service.SubscriptionService;
 import com.gergov.runnaLog.user.model.User;
 import com.gergov.runnaLog.user.model.UserRole;
 import com.gergov.runnaLog.user.repository.UserRepository;
+import com.gergov.runnaLog.web.dto.DailyKmDto;
 import com.gergov.runnaLog.web.dto.EditProfileRequest;
-import com.gergov.runnaLog.web.dto.LoginRequest;
 import com.gergov.runnaLog.web.dto.RegisterRequest;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,34 +37,22 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final StatsService statsService;
     private final SubscriptionService subscriptionService;
+    private final ApplicationEventPublisher eventPublisher;
+    private final RunRepository runRepository;
 
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, StatsService statsService, SubscriptionService subscriptionService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, StatsService statsService, SubscriptionService subscriptionService, ApplicationEventPublisher eventPublisher, RunRepository runRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.statsService = statsService;
         this.subscriptionService = subscriptionService;
-    }
-
-    public User login(LoginRequest loginRequest) {
-
-        Optional<User> optionalUser = userRepository.findByUsername(loginRequest.getUsername());
-        if (optionalUser.isEmpty()) {
-            throw new RuntimeException("Incorrect username or password.");
-        }
-
-        String rawPassword = loginRequest.getPassword();
-        String hashedPassword = optionalUser.get().getPassword();
-
-        if (!passwordEncoder.matches(rawPassword, hashedPassword)) {
-            throw new RuntimeException("Incorrect username or password.");
-        }
-
-        return optionalUser.get();
+        this.eventPublisher = eventPublisher;
+        this.runRepository = runRepository;
     }
 
     @Transactional
+    @CacheEvict(value = {"users", "usersById", "userDataByUsername"}, allEntries = true)
     public void register(RegisterRequest registerRequest) {
 
         Optional<User> optionalUserName = userRepository.findByUsername(registerRequest.getUsername());
@@ -86,24 +80,30 @@ public class UserService implements UserDetailsService {
         statsService.createDefaultStats(user);
         subscriptionService.createDefaultSubscription(user);
 
+        SuccessfulRegistrationEvent event = SuccessfulRegistrationEvent.builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .createdOn(user.getCreatedOn())
+                .build();
+
+        eventPublisher.publishEvent(event);
+
         log.info("New user profile was registered in the system for user [%s].".formatted(registerRequest.getUsername()));
     }
 
+    @Cacheable("users")
     public List<User> getAll() {
 
         return userRepository.findAll();
     }
 
-    public User getByUsername(String username) {
-
-        return userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("User with [%s] username not found.".formatted(username)));
-    }
-
+    @Cacheable("usersById")
     public User getById(UUID id) {
 
         return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User with [%s] id does not exist.".formatted(id)));
     }
 
+    @CacheEvict(value = {"users", "usersById", "userDataByUsername"})
     public void updateUserProfile(UUID id, EditProfileRequest editProfileRequest) {
         User existingUser = getById(id);
 
@@ -127,9 +127,52 @@ public class UserService implements UserDetailsService {
         return new UserData(user.getId(), username, user.getPassword(), user.getRole(), user.isActive());
     }
 
-    public User getUserById(UUID id) {
-        return userRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + id));
+    @Transactional
+    @CacheEvict(value = {"users", "usersById", "userDataByUsername"}, allEntries = true)
+    public void deleteUser(UUID userId, UUID currentUserId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty() || !userOpt.get().getId().equals(userId)) {
+            return;
+        }
+
+        if (userId.equals(currentUserId)) {
+            throw new IllegalArgumentException("Cannot delete yourself.");
+        }
+
+        userRepository.delete(userOpt.get());
+        log.info("Admin deleted user [{}]", userOpt.get().getUsername());
     }
 
+    @Cacheable("userDataByUsername")
+    public UserData findByUsername(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Username not found."));
+        return new UserData(user.getId(), username, user.getPassword(), user.getRole(), user.isActive());
+
+    }
+
+    private List<DailyKmDto> leaderboardCache = new ArrayList<>();
+
+    public List<DailyKmDto> getLeaderboard() {
+        return new ArrayList<>(leaderboardCache);
+    }
+
+    public void recalculateLeaderboard() {
+        List<Object[]> results = runRepository.findUsersSortedByTodayKm();
+        List<DailyKmDto> temp = new ArrayList<>();
+
+        results.forEach(row -> {
+            UUID userId = (UUID) row[0];
+            double km = (Double) row[1];
+            User user = getById(userId);
+            temp.add(new DailyKmDto(userId, user.getUsername(), km));
+        });
+
+        leaderboardCache = temp;
+    }
+
+
+    public void resetLeaderboard() {
+        leaderboardCache.clear();
+    }
 }
+

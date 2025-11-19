@@ -14,12 +14,20 @@ import java.util.UUID;
 @Repository
 public interface RunRepository extends JpaRepository<Run, UUID> {
 
-    List<Run> findByUserOrderByCreatedOnDesc(User user);
-
     List<Run> findByVisibilityOrderByCreatedOnDesc(RunVisibility visibility);
 
-    @Query("SELECT r FROM Run r WHERE r.visibility = 'PUBLIC' AND r.user <> :user ORDER BY RAND()")
+    @Query("SELECT r FROM Run r WHERE r.visibility = 'PUBLIC' AND r.user <> :user ORDER BY r.createdOn DESC")
     List<Run> findVisibleRunsForUser(@Param("user") User user);
 
     List<Run> findByUser(User user);
+
+    @Query("SELECT r FROM Run r WHERE r.visibility = 'PUBLIC' AND r.user = :user ORDER BY r.pace DESC")
+    List<Run> findPublicRunsByUserOrderByPaceDesc(@Param("user") User user);
+
+    @Query("SELECT r.user.id AS userId, SUM(r.distance) AS totalKm " +
+            "FROM Run r " +
+            "WHERE DATE(r.createdOn) = CURRENT_DATE " +
+            "GROUP BY r.user.id " +
+            "ORDER BY totalKm DESC")
+    List<Object[]> findUsersSortedByTodayKm();
 }

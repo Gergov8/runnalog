@@ -2,24 +2,19 @@ package com.gergov.runnaLog.web;
 
 import com.gergov.runnaLog.security.UserData;
 import com.gergov.runnaLog.stats.model.Stats;
-import com.gergov.runnaLog.subscription.model.SubscriptionPeriod;
-import com.gergov.runnaLog.subscription.model.SubscriptionType;
 import com.gergov.runnaLog.subscription.service.SubscriptionService;
 import com.gergov.runnaLog.user.model.User;
 import com.gergov.runnaLog.user.service.UserService;
 import com.gergov.runnaLog.web.dto.SubscriptionUpgradeRequest;
-import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.util.UUID;
 
 @Controller
 @RequestMapping("/subscriptions")
@@ -66,25 +61,33 @@ public class SubscriptionController {
 
     @PostMapping("/purchase")
     public ModelAndView purchaseSubscription(
-            @RequestParam("type") SubscriptionType type,
-            @RequestParam(value = "period", defaultValue = "MONTHLY") SubscriptionPeriod period,
-            RedirectAttributes redirectAttributes,
-            HttpSession session) {
+            @Valid SubscriptionUpgradeRequest subscriptionUpgradeRequest,
+            BindingResult bindingResult,
+            @AuthenticationPrincipal UserData userData) {
 
-        UUID userId = (UUID) session.getAttribute("userId");
-        User user = userService.getById(userId);
+        User user = userService.getById(userData.getId());
+        Stats stats = user.getStats();
 
-        boolean success = subscriptionService.purchaseSubscription(user, type, period);
-
-        ModelAndView modelAndView = new ModelAndView("subscriptions");
-
-        if (success) {
-            modelAndView.addObject("message", "Subscription purchased successfully!");
-        } else {
-            modelAndView.addObject("error", "Not enough STR to purchase this plan.");
+        if (bindingResult.hasErrors()) {
+            ModelAndView mav = new ModelAndView("subscriptions");
+            mav.addObject("error", "Invalid subscription data. Please try again.");
+            mav.addObject("stats", stats);
+            mav.addObject("subscriptionUpgradeRequest", new SubscriptionUpgradeRequest());
+            return new ModelAndView("redirect:/subscriptions?errorrr");
         }
 
-        modelAndView.addObject("subscriptionUpgradeRequest", new SubscriptionUpgradeRequest());
-        return modelAndView;
+        boolean success = subscriptionService.purchaseSubscription(user, subscriptionUpgradeRequest.getType());
+
+        if (success) {
+            return new ModelAndView("redirect:/subscriptions?success");
+        } else {
+            ModelAndView mav = new ModelAndView("subscriptions");
+            mav.addObject("error", "Not enough STR to purchase this plan.");
+            mav.addObject("stats", stats);
+            mav.addObject("subscriptionUpgradeRequest", new SubscriptionUpgradeRequest());
+            return new ModelAndView("redirect:/subscriptions?error");
+        }
     }
+
+
 }

@@ -1,16 +1,16 @@
 package com.gergov.runnaLog.run.model;
 
+import lombok.Getter;
+
+@Getter
 public enum RunVisibility {
     PUBLIC ("Public"),
     PRIVATE ("Private");
 
-    private String displayName;
+    private final String displayName;
 
     RunVisibility(String displayName) {
         this.displayName = displayName;
     }
 
-    public String getDisplayName() {
-        return displayName;
-    }
 }

@@ -6,18 +6,17 @@ import com.gergov.runnaLog.run.model.RunVisibility;
 import com.gergov.runnaLog.run.repository.RunRepository;
 import com.gergov.runnaLog.stats.service.StatsService;
 import com.gergov.runnaLog.user.model.User;
-import com.gergov.runnaLog.user.repository.UserRepository;
 import com.gergov.runnaLog.web.dto.CreateRunRequest;
 import com.gergov.runnaLog.web.dto.RunResponseDto;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -28,18 +27,17 @@ public class RunService {
     private final RunRepository runRepository;
     private final StatsService statsService;
     private final LikeService likeService;
-    private final UserRepository userRepository;
 
 
     @Autowired
-    public RunService(RunRepository runRepository, StatsService statsService, LikeService likeService, UserRepository userRepository) {
+    public RunService(RunRepository runRepository, StatsService statsService, LikeService likeService) {
         this.runRepository = runRepository;
         this.statsService = statsService;
         this.likeService = likeService;
-        this.userRepository = userRepository;
     }
 
-    public Run createRun(CreateRunRequest createRunRequest, User user) {
+    @Transactional
+    public void createRun(CreateRunRequest createRunRequest, User user) {
 
         Duration duration = Duration.ofHours(createRunRequest.getDurationHours())
                 .plusMinutes(createRunRequest.getDurationMinutes())
@@ -62,7 +60,7 @@ public class RunService {
                 .user(user)
                 .build();
 
-        Run savedRun =  runRepository.save(run);
+        runRepository.save(run);
 
         statsService.updateUserStatsAfterRun(user, createRunRequest.getDistance(), totalSeconds, pace);
 
@@ -72,25 +70,6 @@ public class RunService {
 
         log.info("User [%s] created a run of [%.2f] km in [%d]:[%d]:[%d]".formatted(user.getUsername(), createRunRequest.getDistance(),
                 hours, minutes, seconds));
-        return savedRun;
-    }
-
-    private Duration parseDuration(String input) {
-        // очаква "HH:MM:SS" или "MM:SS"
-        String[] parts = input.split(":");
-        if (parts.length == 3) {
-            return Duration.ofHours(Long.parseLong(parts[0]))
-                    .plusMinutes(Long.parseLong(parts[1]))
-                    .plusSeconds(Long.parseLong(parts[2]));
-        } else if (parts.length == 2) {
-            return Duration.ofMinutes(Long.parseLong(parts[0]))
-                    .plusSeconds(Long.parseLong(parts[1]));
-        }
-        throw new IllegalArgumentException("Invalid duration format: " + input);
-    }
-
-    private Long calculateTotalSeconds(Duration duration) {
-        return duration.getSeconds();
     }
 
     private String calculatePace(long totalSeconds, Double distance) {
@@ -106,16 +85,6 @@ public class RunService {
     }
 
 
-//    public String formatDuration(Run run) {
-//
-//        if (run.getHours() > 0) {
-//            return String.format("%d:%02d:%02d", run.getHours(), run.getMinutes(), run.getSeconds());
-//        } else {
-//            return String.format("%d:%02d", run.getMinutes(), run.getSeconds());
-//        }
-//
-//    }
-
     public List<Run> getVisibleRuns(User currentUser) {
         if (currentUser == null) {
             return runRepository.findByVisibilityOrderByCreatedOnDesc(RunVisibility.PUBLIC);
@@ -125,77 +94,39 @@ public class RunService {
     }
 
 
-    public List<Run> getUserRuns(User user) {
-        return runRepository.findByUserOrderByCreatedOnDesc(user);
-    }
-
-
-    public Optional<Run> getRunIfVisible(UUID runId, User currentUser) {
-        Optional<Run> runOpt = runRepository.findById(runId);
-        if (runOpt.isEmpty()) return Optional.empty();
-
-        Run run = runOpt.get();
-
-
-        if (run.getVisibility() == RunVisibility.PUBLIC) {
-            return runOpt;
-        } else if (currentUser != null && run.getUser().getId().equals(currentUser.getId())) {
-            return runOpt;
-        }
-
-        return Optional.empty();
-    }
-
-
     @Transactional
-    public boolean deleteRun(UUID runId, User user) {
-        Optional<Run> runOpt = runRepository.findById(runId);
-        if (runOpt.isEmpty() || !runOpt.get().getUser().getId().equals(user.getId())) {
-            return false;
+    public void deleteRun(User user, Run run) {
+
+        boolean isOwner = user.getId().equals(run.getUser().getId());
+        boolean isAdmin = user.getRole().getDisplayName().equals("Admin");
+
+        // Ensure the logged-in user is the owner or its the Admin
+        if (!isOwner && !isAdmin) {
+            throw new AccessDeniedException("You are not allowed to delete this run!");
         }
 
-        runRepository.delete(runOpt.get());
-        log.info("User [{}] deleted run [{}]", user.getUsername(), runId);
-        return true;
-    }
 
+        runRepository.delete(run);
+        statsService.updateUserStatsAfterDeleteRun(user, run.getDistance(), run.getDuration().getSeconds());
+        log.info("User [{}] deleted run [{}]", user.getUsername(), run.getId());
+    }
     public List<RunResponseDto> getFeed(User currentUser) {
         return getVisibleRuns(currentUser).stream()
                 .map(run -> new RunResponseDto(
-                        run.getId(), // this was missing
+                        run.getId(),
+                        run.getUser().getId(),
                         run.getUser().getUsername(),
+                        run.getUser().getProfilePicture(),
                         run.getDistance(),
                         formatDuration(run.getDuration()),
                         run.getPace(),
                         run.getTitle(),
-                        run.getLikes().size(), // likesCount
-                        run.getLikes().contains(currentUser) // likedByCurrentUser
+                        likeService.getLikesCount(run.getId()),
+                        likeService.isRunLikedByUser(currentUser, run)
                 ))
                 .toList();
     }
 
-
-
-//    public List<Run> getFeedWithLikes(User currentUser) {
-//        List<Run> runs = getVisibleRuns(currentUser);
-//
-//        for (Run run : runs) {
-//            int likes = likeService.getLikesCount(run.getId());
-//            run.setLikesCount(likes);
-//
-//            User user = userRepository.findById(currentUser.getId()).orElseThrow();
-//            boolean likedByUser = likeService.isRunLikedByUser(user, run);
-//            run.setLikedByCurrentUser(likedByUser);
-//
-//            // Example scoring formula: likes + recency in hours
-//            long hoursAgo = java.time.Duration.between(run.getCreatedOn(), java.time.LocalDateTime.now()).toHours();
-//            run.setScore(likes * 2.0 + Math.max(0, 100 - hoursAgo));
-//        }
-//
-//        // Sort by score descending
-//        runs.sort((r1, r2) -> Double.compare(r2.getScore(), r1.getScore()));
-//        return runs;
-//    }
 
     private String formatDuration(Duration duration) {
         long hours = duration.toHours();
@@ -211,4 +142,7 @@ public class RunService {
         return runRepository.findByUser(user);
     }
 
+    public Run getRunById(UUID runId) {
+        return runRepository.findById(runId).orElseThrow(() -> new RuntimeException("Run with [%s] id not found.".formatted(runId)));
+    }
 }

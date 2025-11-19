@@ -1,0 +1,436 @@
+/* ------------------------------
+   Global Page Layout
+--------------------------------*/
+.run-details-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+    font-family: 'Montserrat', sans-serif;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Add these two lines to make it sticky */
+.header{
+    position: sticky;
+    top: 0;
+    z-index: 1000; /* Ensure it stays above other content */
+}
+
+/* ------------------------------
+   Run Header - Apple Liquid Glass
+--------------------------------*/
+.run-header {
+    background: radial-gradient(circle at top left, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 60%, rgba(255,255,255,0.03) 100%);
+    backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
+    -webkit-backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.25),
+            0 8px 40px rgba(0,0,0,0.45),
+            0 0 120px rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Liquid shimmer animation */
+.run-header {
+    background-size: 200% 200%;
+    animation: shimmer 12s linear infinite;
+}
+
+
+.run-header::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+            radial-gradient(420px 260px at 82% 22%, rgba(255,255,255,.15), rgba(255,255,255,0) 60%),
+            linear-gradient(to right, rgba(0,0,0,.05) 0%, rgba(0,0,0,0) 45%);
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 20px;
+}
+
+.run-header h1 {
+    margin: 0 0 1rem 0;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 2.5vw, 2.5rem);
+    color: #f9eecf;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
+    line-height: 1.1;
+    position: relative;
+    z-index: 2;
+}
+
+.run-header h1::after {
+    content: "";
+    display: block;
+    margin-top: 1rem;
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, #f9eecf, rgba(249, 238, 207, 0.15));
+    border-radius: 9px;
+    box-shadow: 0 0 16px rgba(249, 238, 207, 0.4);
+}
+
+.run-meta {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    z-index: 2;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #f9eecf;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 2;
+}
+
+.back-link:hover {
+    color: #ffffff;
+    text-shadow: 0 0 12px rgba(249, 238, 207, 0.6);
+}
+
+/* ------------------------------
+   Run Details Panel - Apple Liquid Glass
+--------------------------------*/
+.run-info-card {
+    background: radial-gradient(circle at top left, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 60%, rgba(255,255,255,0.03) 100%);
+    backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
+    -webkit-backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.25),
+            0 8px 40px rgba(0,0,0,0.45),
+            0 0 120px rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.run-info-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+            radial-gradient(320px 180px at 75% 25%, rgba(255,255,255,.12), rgba(255,255,255,0) 60%);
+    mix-blend-mode: soft-light;
+    pointer-events: none;
+    z-index: 1;
+    border-radius: 20px;
+}
+
+.run-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+    position: relative;
+    z-index: 2;
+}
+
+.run-stat {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    padding: 1.5rem 1rem;
+    border-radius: 16px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.run-stat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #D4AF37, #E6C967, #F5E7C5);
+    opacity: 0.7;
+}
+
+.run-stat:hover {
+    transform: translateY(-2px);
+    border-color: rgba(212, 175, 55, 0.4);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+
+.run-stat-label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.run-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #f9eecf;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* ------------------------------
+   Comments Section - Apple Liquid Glass
+--------------------------------*/
+.comments-section {
+    margin-top: 2rem;
+}
+
+.comments-section h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: #f9eecf;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
+    position: relative;
+}
+
+.comments-section h2::after {
+    content: "";
+    display: block;
+    margin-top: 0.5rem;
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, #f9eecf, rgba(249, 238, 207, 0.15));
+    border-radius: 9px;
+    box-shadow: 0 0 16px rgba(249, 238, 207, 0.4);
+}
+
+.comment {
+    background: radial-gradient(circle at top left, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 60%, rgba(255,255,255,0.02) 100%);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.comment:hover {
+    transform: translateY(-2px);
+    border-color: rgba(212, 175, 55, 0.3);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.comment-author {
+    font-weight: 600;
+    color: #f9eecf;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1rem;
+}
+
+.comment-date {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.comment-body {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* ------------------------------
+   Add Comment Form - Apple Liquid Glass
+--------------------------------*/
+.add-comment-form {
+    margin-top: 1.7rem;
+    background: radial-gradient(circle at top left, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 60%, rgba(255,255,255,0.02) 100%);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+}
+
+.add-comment-form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    border-radius: 16px 16px 0 0;
+}
+
+.error-message {
+    color: #ff6b6b;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 107, 107, 0.1);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.add-comment-form textarea {
+    width: 100%;
+    height: 120px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 1rem;
+    resize: vertical;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 0.95rem;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+.add-comment-form textarea:focus {
+    outline: none;
+    border-color: rgba(212, 175, 55, 0.5);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+}
+
+.add-comment-form textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.add-comment-form button {
+    margin-top: 1rem;
+    background: linear-gradient(145deg, rgba(255,255,255,0.75) 0%, rgba(240,240,240,0.55) 100%);
+    color: #1b1b1b;
+    padding: 0.875rem 1.5rem;
+    border: 1px solid rgba(255,255,255,0.45);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2), inset 0 1px rgba(255,255,255,0.4);
+}
+
+.add-comment-form button:hover {
+    background: linear-gradient(145deg, rgba(255,255,255,0.85) 0%, rgba(240,240,240,0.65) 100%);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px rgba(255,255,255,0.5);
+    transform: translateY(-1px);
+}
+
+/* ------------------------------
+   Delete Button (Admin or Owner)
+--------------------------------*/
+.comment {
+    position: relative; /* This allows absolute positioning inside */
+    padding-right: 120px; /* Make space for the delete button */
+}
+
+.delete-btn-container {
+    position: absolute;
+    right: 1.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.btn-delete {
+    background: rgba(229, 57, 53, 0.2);
+    color: #ff6b6b;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid rgba(229, 57, 53, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(20px);
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+}
+
+.btn-delete:hover {
+    background: rgba(229, 57, 53, 0.3);
+    color: #ff5252;
+    border-color: rgba(229, 57, 53, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(229, 57, 53, 0.2);
+}
+
+.form-input.error {
+    border-color: var(--error-border);
+    background: var(--error-bg);
+}
+
+.error-message {
+    color: var(--error-text);
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* ------------------------------
+   Responsive Design
+--------------------------------*/
+@media (max-width: 768px) {
+    .run-details-container {
+        margin: 1rem auto;
+        padding: 0 0.5rem;
+    }
+
+    .run-header,
+    .run-info-card,
+    .add-comment-form {
+        padding: 1.5rem;
+    }
+
+    .run-stats-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 1rem;
+    }
+
+    .run-stat {
+        padding: 1.25rem 0.75rem;
+    }
+
+    .run-stat-value {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .run-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .comment-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+}

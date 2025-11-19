@@ -1,14 +1,12 @@
 package com.gergov.runnaLog.web;
 
-import com.gergov.runnaLog.run.service.RunService;
+import com.gergov.runnaLog.run.model.Run;
 import com.gergov.runnaLog.security.UserData;
 import com.gergov.runnaLog.stats.model.Stats;
+import com.gergov.runnaLog.subscription.model.Subscription;
 import com.gergov.runnaLog.user.model.User;
 import com.gergov.runnaLog.user.service.UserService;
-import com.gergov.runnaLog.web.dto.CreateRunRequest;
 import com.gergov.runnaLog.web.dto.EditProfileRequest;
-import com.gergov.runnaLog.web.dto.RegisterRequest;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,12 +26,10 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
-    private final RunService runService;
 
     @Autowired
-    public UserController(UserService userService, RunService runService) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.runService = runService;
     }
 
     // GET /users/{id}/profile - View profile page
@@ -44,12 +41,29 @@ public class UserController {
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("profile");
 
-        // Add stats if needed for the profile page
         Stats stats = user.getStats();
+        List<Run> runs = user.getRuns();
+        List<Subscription> subs = user.getSubscriptions();
+        LocalDateTime date = LocalDateTime.now();
         modelAndView.addObject("stats", stats);
+        modelAndView.addObject("runs", runs);
+        modelAndView.addObject("subs", subs);
+        modelAndView.addObject("date", date);
         modelAndView.addObject("user", user);
 
         return modelAndView;
+    }
+
+    @DeleteMapping("/delete/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ModelAndView deleteRun(@AuthenticationPrincipal UserData userData,
+                                  @PathVariable UUID userId) {
+
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(userData.getId());
+        userService.deleteUser(userId, userData.getId());
+
+        return new ModelAndView("redirect:/users");
     }
 
     // GET /users/{id}/profile/edit - Show edit profile form

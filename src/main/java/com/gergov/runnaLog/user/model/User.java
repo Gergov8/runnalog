@@ -1,7 +1,6 @@
 package com.gergov.runnaLog.user.model;
 
 import com.gergov.runnaLog.comment.model.Comment;
-import com.gergov.runnaLog.goal.model.Goal;
 import com.gergov.runnaLog.like.model.Like;
 import com.gergov.runnaLog.run.model.Run;
 import com.gergov.runnaLog.stats.model.Stats;
@@ -68,10 +67,7 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Like> likes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Goal> goals = new ArrayList<>();
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Stats stats;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

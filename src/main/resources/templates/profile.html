@@ -522,17 +522,81 @@
         <!-- Left rail: latest runs / subscription history -->
         <aside class="p-card">
             <h3 class="rail-title"><a th:href="@{'/runs/' + ${user.id}}">Latest Runs</a></h3>
+
             <div class="rail-list">
-                <div class="rail-item"><div class="icon">🏃</div><div><strong>5 km</strong> • 00:26:00</div></div>
-                <div class="rail-item"><div class="icon">🏃</div><div><strong>10 km</strong> • 00:45:00</div></div>
+
+                <div th:if="${runs.isEmpty()}">
+                    <div class="icon">🏃‍♂️</div>
+                    <h3>No Runs Yet</h3>
+                    <p>Start your running journey by adding your first run!</p>
+                    <a th:href="@{'/runs/add'}" class="btn btn-primary" style="margin-top: 1rem;">Add Your First Run</a>
+                </div>
+
+                <div th:unless="${runs.isEmpty()}">
+                    <a th:href="${'/runs/' + runs.get(runs.size() - 1).id + '/details' }">
+                    <div class="rail-item">
+                        <div class="icon">🏃‍♂️</div>
+                        <div><strong th:text="${runs.get(runs.size() - 1).distance} + 'km'"></strong></div> ·
+                        <div th:text="${runs.get(runs.size() - 1).duration.toHours() + ':' + (runs.get(runs.size() - 1).duration.toMinutesPart() < 10 ? '0' : '') + runs.get(runs.size() - 1).duration.toMinutesPart() + ':' + (runs.get(runs.size() - 1).duration.toSecondsPart() < 10 ? '0' : '') + runs.get(runs.size() - 1).duration.toSecondsPart()}">
+                                00:45:00
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <div th:unless="${runs.size() < 2}">
+                    <a th:href="${'/runs/' + runs.get(runs.size() - 2).id + '/details' }">
+                    <div class="rail-item">
+                        <div class="icon">🏃‍♂️</div>
+                        <div><strong th:text="${runs.get(runs.size() - 2).distance} + 'km'"></strong></div> ·
+                        <div th:text="${runs.get(runs.size() - 2).duration.toHours() + ':' + (runs.get(runs.size() - 2).duration.toMinutesPart() < 10 ? '0' : '') + runs.get(runs.size() - 2).duration.toMinutesPart() + ':' + (runs.get(runs.size() - 2).duration.toSecondsPart() < 10 ? '0' : '') + runs.get(runs.size() - 2).duration.toSecondsPart()}">
+                            00:45:00
+                        </div>
+                    </div>
+                    </a>
+                </div>
+
+                <div th:unless="${runs.size() < 3}">
+                    <a th:href="${'/runs/' + runs.get(runs.size() - 3).id + '/details' }">
+                    <div class="rail-item">
+                        <div  class="icon">🏃‍♂️</div>
+                        <div><strong th:text="${runs.get(runs.size() - 3).distance} + 'km'"></strong></div> ·
+                        <div th:text="${runs.get(runs.size() - 3).duration.toHours() + ':' + (runs.get(runs.size() - 3).duration.toMinutesPart() < 10 ? '0' : '') + runs.get(runs.size() - 3).duration.toMinutesPart() + ':' + (runs.get(runs.size() - 3).duration.toSecondsPart() < 10 ? '0' : '') + runs.get(runs.size() - 3).duration.toSecondsPart()}">
+                            00:45:00
+                        </div>
+                    </div>
+                    </a>
+                </div>
             </div>
 
-            <hr>
 
             <h3 class="rail-title"><a href="/subscriptions/history">Subscription History</a></h3>
             <div class="rail-list">
-                <div class="rail-item"><div class="icon">⭐</div><div>Pro Monthly • Active</div></div>
-                <div class="rail-item"><div class="icon">⭐</div><div>Coach Plan • Canceled (Aug)</div></div>
+
+                    <div class="rail-item">
+                        <div class="icon">⭐</div>
+                        <div><strong th:text="${subs.get(subs.size() - 1).type.getDisplayName()}"></strong></div> ·
+                        <div th:if="${subs.get(subs.size() - 1).type.displayName.equals('Recreational')}">
+                            <strong style="font-size: 20px">∞</strong>
+                        </div>
+                        <div th:unless="${subs.get(subs.size() - 1).type.displayName.equals('Recreational')}">
+                            <div th:text="${subs.get(subs.size() - 1).expiryOn.getDayOfYear() - date.getDayOfYear()}">
+                        </div>
+                    </div>
+                </div>
+
+                <div th:unless="${subs.size() < 2}">
+                    <div class="rail-item">
+                        <div class="icon">⭐</div>
+                        <div><strong th:text="${subs.get(subs.size() - 2).type.getDisplayName()}"></strong></div> ·
+                        <div th:if="${subs.get(subs.size() - 2).type.displayName.equals('Recreational')}">
+                            <strong style="font-size: 20px">∞</strong>
+                        </div>
+                        <div th:unless="${subs.get(subs.size() - 2).type.displayName.equals('Recreational')}">
+                            <div th:text="${subs.get(subs.size() - 2).expiryOn.getDayOfYear() - date.getDayOfYear()}"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </aside>
 
@@ -573,7 +637,7 @@
 
             <div class="single-section-box home-subscription">
                 <div class="default-label-box">
-                    <p th:text="${user.subscriptions[0].type + ' SUBSCRIPTION'}">ULTIMATE SUBSCRIPTION</p>
+                    <p th:text="${user.subscriptions[#lists.size(user.subscriptions)-1].type + ' SUBSCRIPTION'}">ULTIMATE SUBSCRIPTION</p>
                 </div>
                 <table class="styled-table">
                     <thead>
@@ -585,11 +649,11 @@
                     </thead>
                     <tbody>
                     <tr>
-                        <td th:if="${user.subscriptions[0].status.name() == 'ACTIVE'}"><span class="status active">ACTIVE</span></td>
-                        <td th:if="${user.subscriptions[0].status.name() == 'COMPLETED'}"><span class="status completed">COMPLETED</span></td>
-                        <td th:if="${user.subscriptions[0].status.name() == 'TERMINATED'}"><span class="status terminated">TERMINATED</span></td>
-                        <td th:text="${user.subscriptions[0].period}">Monthly</td>
-                        <td th:text="${user.subscriptions[0].price + ' STR'}">49.99 EUR</td>
+                        <td th:if="${user.subscriptions.get(subs.size() - 1).status.name() == 'ACTIVE'}"><span class="status active">ACTIVE</span></td>
+                        <td th:if="${user.subscriptions.get(subs.size() - 1).status.name() == 'COMPLETED'}"><span class="status completed">COMPLETED</span></td>
+                        <td th:if="${user.subscriptions.get(subs.size() - 1).status.name() == 'TERMINATED'}"><span class="status terminated">TERMINATED</span></td>
+                        <td th:text="${user.subscriptions.get(subs.size() - 1).period.getDisplayName()}">Monthly</td>
+                        <td th:text="${user.subscriptions.get(subs.size() - 1).price}">49.99 EUR</td>
                     </tr>
                     </tbody>
                 </table>

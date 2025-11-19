@@ -60,7 +60,7 @@
 <main class="page">
     <section class="card">
         <h1 class="card-title">ADD RUN</h1>
-        <form class="form" th:method="post" th:action="@{'/runs/' + ${userId} + '/add'}" th:object="${createRunRequest}">
+        <form class="form" th:method="post" th:action="@{'/runs/add'}" th:object="${createRunRequest}">
 
             <div class="form-row">
                 <label class="label" for="distance">DISTANCE (KM):</label>

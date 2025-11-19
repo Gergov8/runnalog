@@ -74,8 +74,8 @@
         <h1 class="card-title">Choose Your Plan</h1>
         <div class="plans">
             <!-- Recreational Plan -->
-            <form th:action="@{/subscriptions/purchase}" method="post" class="plan-card">
-                <input type="hidden" name="planType" value="RECREATIONAL">
+            <form th:action="@{/subscriptions/purchase}" th:object="${subscriptionUpgradeRequest}" method="post" class="plan-card">
+                <input type="hidden" name="type" value="RECREATIONAL">
                 <div class="plan-title">Recreational</div>
                 <div class="plan-price">Free</div>
                 <ul class="plan-features">
@@ -88,10 +88,10 @@
             </form>
 
             <!-- Competitive Plan -->
-            <form th:action="@{/subscriptions/purchase}" method="post" class="plan-card">
-                <input type="hidden" name="planType" value="COMPETITIVE">
+            <form th:action="@{/subscriptions/purchase}" th:object="${subscriptionUpgradeRequest}" method="post" class="plan-card">
+                <input type="hidden" name="type" value="COMPETITIVE">
                 <div class="plan-title">Competitive</div>
-                <div class="plan-price">2500 STR / month</div>
+                <div class="plan-price">6000 STR / month</div>
                 <ul class="plan-features">
                     <li>Advanced analytics</li>
                     <li>Custom training plans</li>
@@ -103,10 +103,10 @@
             </form>
 
             <!-- Elite Plan -->
-            <form th:action="@{/subscriptions/purchase}" method="post" class="plan-card">
-                <input type="hidden" name="planType" value="ELITE">
+            <form th:action="@{/subscriptions/purchase}" th:object="${subscriptionUpgradeRequest}" method="post" class="plan-card">
+                <input type="hidden" name="type" value="ELITE">
                 <div class="plan-title">Elite</div>
-                <div class="plan-price">6000 STR / month</div>
+                <div class="plan-price">15000 STR / month</div>
                 <ul class="plan-features">
                     <li>Everything in Competitive</li>
                     <li>1-on-1 coaching sessions</li>

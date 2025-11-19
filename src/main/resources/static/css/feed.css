@@ -1,3 +1,7 @@
+* {
+    overflow-anchor: auto;
+}
+
 /* Feed-specific styles */
 .feed-container {
     max-width: 1200px;
@@ -8,10 +12,18 @@
 
 .feed-layout {
     display: grid;
-    grid-template-columns: 280px 1fr;
+    grid-template-columns: 320px 1fr; /* Increased from 280px to 320px */
     gap: 2rem;
     height: 100%;
 }
+
+.avatar-sm img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
 
 @media (max-width: 768px) {
     .feed-layout {
@@ -19,7 +31,7 @@
     }
 }
 
-/* Profile card styling - Made more compact */
+/* Profile card styling - Made larger */
 .profile-card {
     background: radial-gradient(circle at top left, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 60%, rgba(255,255,255,0.03) 100%);
     backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
@@ -30,20 +42,20 @@
             0 8px 40px rgba(0,0,0,0.45),
             0 0 120px rgba(255,255,255,0.06);
     border-radius: 20px;
-    padding: 1.5rem;
+    padding: 2rem; /* Increased padding */
     height: fit-content;
     position: sticky;
     top: 100px;
 }
 
 .avatar-lg {
-    width: 100px; /* Smaller avatar */
-    height: 100px; /* Smaller avatar */
+    width: 120px; /* Increased from 100px to 120px */
+    height: 120px; /* Increased from 100px to 120px */
     border-radius: 50%;
     overflow: hidden;
-    margin: 0 auto 1rem; /* Reduced margin */
+    margin: 0 auto 1.5rem; /* Increased margin */
     border: 2px solid rgba(212, 175, 55, 0.5);
-    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
 }
 
 .avatar-lg img {
@@ -55,24 +67,24 @@
 .profile-name {
     font-family: 'Montserrat', sans-serif;
     font-weight: 700;
-    font-size: 1.3rem; /* Smaller font */
+    font-size: 1.5rem; /* Increased from 1.3rem */
     color: #f9eecf;
     text-align: center;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem; /* Increased margin */
     text-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
 }
 
 .profile-status {
     text-align: center;
-    margin-bottom: 1rem; /* Reduced margin */
+    margin-bottom: 1.5rem; /* Increased margin */
 }
 
 .active-profile {
     background: rgba(0, 210, 106, 0.2);
     color: #00d26a;
-    padding: 0.25rem 0.75rem;
+    padding: 0.35rem 1rem; /* Slightly larger padding */
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.8rem; /* Slightly larger font */
     font-weight: 600;
     letter-spacing: 0.5px;
 }
@@ -80,9 +92,9 @@
 .inactive-profile {
     background: rgba(255, 59, 48, 0.2);
     color: #ff3b30;
-    padding: 0.25rem 0.75rem;
+    padding: 0.35rem 1rem; /* Slightly larger padding */
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.8rem; /* Slightly larger font */
     font-weight: 600;
     letter-spacing: 0.5px;
 }
@@ -90,15 +102,15 @@
 .profile-stats {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem; /* Reduced gap */
-    margin-bottom: 1rem; /* Reduced margin */
+    gap: 1rem; /* Increased gap */
+    margin-bottom: 1.5rem; /* Increased margin */
 }
 
 .profile-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 0.5rem; /* Reduced padding */
+    padding-bottom: 0.75rem; /* Increased padding */
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -108,12 +120,12 @@
 
 .profile-row .muted {
     color: rgba(255, 255, 255, 0.7);
-    font-size: 0.85rem; /* Smaller font */
+    font-size: 0.9rem; /* Slightly larger font */
 }
 
 .profile-row strong {
     color: #f9eecf;
-    font-size: 1rem; /* Smaller font */
+    font-size: 1.1rem; /* Slightly larger font */
     font-weight: 700;
 }
 
@@ -401,6 +413,99 @@
         transform: translateY(0) rotate(360deg);
         opacity: 0.7;
     }
+}
+
+/* Leaderboard card */
+.leaderboard-card {
+    background: radial-gradient(circle at top left, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 60%, rgba(255,255,255,0.03) 100%);
+    backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
+    -webkit-backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.25),
+            0 8px 40px rgba(0,0,0,0.45),
+            0 0 120px rgba(255,255,255,0.06);
+    border-radius: 20px;
+    padding: 1.8rem;
+    margin-bottom: 2rem;
+}
+
+.leaderboard-title {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: #f9eecf;
+    margin-bottom: 1.2rem;
+    text-shadow: 0 0 8px rgba(255,255,255,0.3);
+}
+
+/* Table layout */
+.leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.leaderboard-header,
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 80px;
+    align-items: center;
+}
+
+/* Header */
+.leaderboard-header {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+}
+
+/* Rows */
+.leaderboard-row {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.2s ease;
+}
+
+.leaderboard-row:hover {
+    background: rgba(255,255,255,0.05);
+    border-radius: 8px;
+}
+
+/* Position number */
+.position {
+    color: #f9eecf;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+/* User info */
+.lb-user {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.lb-user span {
+    color: #f9eecf;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+/* KM column */
+.today-km {
+    color: #f9eecf;
+    font-weight: 700;
+    text-align: right;
+}
+
+/* Empty state */
+.leaderboard-empty {
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    margin-top: 1rem;
+    font-size: 0.95rem;
 }
 
 /* Particle positioning */

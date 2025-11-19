@@ -1,16 +1,20 @@
 package com.gergov.runnaLog.web.dto;
 
+
+
 import java.util.UUID;
 
 public record RunResponseDto(
         UUID id,
+        UUID userId,
         String username,
+        String profilePic,
         double distance,
         String duration,
         String pace,
         String title,
-        int likesCount,               // New field
-        boolean likedByCurrentUser    // New field
+        int likesCount,
+        boolean likedByCurrentUser
 
 ) {}
 

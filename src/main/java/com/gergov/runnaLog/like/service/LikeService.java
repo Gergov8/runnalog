@@ -5,6 +5,9 @@ import com.gergov.runnaLog.like.repository.LikeRepository;
 import com.gergov.runnaLog.run.model.Run;
 import com.gergov.runnaLog.run.repository.RunRepository;
 import com.gergov.runnaLog.user.model.User;
+import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,16 +27,18 @@ public class LikeService {
         this.runRepository = runRepository;
     }
 
-    public boolean likeRun(UUID runId, User user) {
+    @Transactional
+    @CacheEvict(value = "likesCount", allEntries = true)
+    public void likeRun(UUID runId, User user) {
         Optional<Run> runOpt = runRepository.findById(runId);
         if (runOpt.isEmpty()) {
-            return false;
+            return;
         }
 
         Run run = runOpt.get();
 
         if (likeRepository.existsByUserAndRun(user, run)) {
-            return false; // Вече е харесано
+            return; // Вече е харесано
         }
 
         Like like = Like.builder()
@@ -43,25 +48,26 @@ public class LikeService {
                 .build();
 
         likeRepository.save(like);
-        return true;
     }
 
-    public boolean unlikeRun(UUID runId, User user) {
+    @Transactional
+    @CacheEvict(value = "likesCount", allEntries = true)
+    public void unlikeRun(UUID runId, User user) {
         Optional<Run> runOpt = runRepository.findById(runId);
         if (runOpt.isEmpty()) {
-            return false;
+            return;
         }
 
         Run run = runOpt.get();
 
         if (!likeRepository.existsByUserAndRun(user, run)) {
-            return false; // Още не е харесано
+            return; // Още не е харесано
         }
 
         likeRepository.deleteByUserAndRun(user, run);
-        return true;
     }
 
+    @Cacheable("likesCount")
     public int getLikesCount(UUID runId) {
         Optional<Run> runOpt = runRepository.findById(runId);
         return runOpt.map(run -> likeRepository.findByRun(run).size()).orElse(0);

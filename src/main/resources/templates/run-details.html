@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Run Details - RunnaLog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            DEFAULT: '#D4AF37',
+                            soft: '#E6C967',
+                            light: '#F5E7C5'
+                        }
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mont: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        roboCond: ['Roboto Condensed', 'ui-sans-serif', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        glow: '0 0 0 2px rgba(212,175,55,0.35), 0 8px 30px rgba(0,0,0,0.35)',
+                        gold: '0 0 20px rgba(212,175,55,0.4)'
+                    },
+                    backdropBlur: {
+                        xs: '2px'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <link rel="stylesheet" href="/css/feed.css">
+    <link rel="stylesheet" href="/css/run-details.css">
+</head>
+
+<body class="min-h-screen overflow-x-hidden bg-black text-white font-open-sans">
+<!-- Background elements -->
+<div class="bg-layer">
+    <img src="/images/background.png" alt="Background" />
+</div>
+
+<!-- Floating particles -->
+<div class="particles">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<!-- Header -->
+<header class="header">
+    <div class="logo"><a href="/feed">RUNNALOG</a></div>
+    <div class="header-actions">
+<!--        <div class="strides-balance-header">-->
+<!--            <span class="strides-amount-header" th:text="${stats.strides}">12,500</span>-->
+<!--            <span class="strides-label-header">Strides</span>-->
+<!--        </div>-->
+
+<!--        <a class="btn btn-primary" th:href="@{'/runs/' + ${user.id} + '/add'}">ADD RUN</a>-->
+        <a class="btn btn-primary" href="/subscriptions">UPGRADE</a>
+
+        <!-- 👇 Only visible to admins -->
+        <div sec:authorize="hasRole('ADMIN')">
+            <a class="btn btn-primary" href="/users">MANAGE USERS</a>
+        </div>
+
+        <a class="btn btn-primary" href="/logout">LOGOUT</a>
+        <div class="avatar-sm" title="You">
+            <a th:href="@{'/users/profile'}">.</a>
+        </div>
+    </div>
+
+</header>
+
+
+<main class="run-details-container">
+
+    <!-- Run Header -->
+    <section class="run-header">
+        <a href="/feed" class="back-link">← Back to all runs</a>
+
+        <h1 th:text="${run.title}">Morning Run</h1>
+        <div class="run-meta">
+            <span>Date: </span><span th:text="${#temporals.format(run.createdOn, 'dd MMM YYYY HH:mm')}">2025-11-14</span>
+        </div>
+
+
+    <!-- Run Details Card -->
+        <div class="run-stats-grid">
+
+            <div class="run-stat">
+                <div class="run-stat-label">Distance</div>
+                <div class="run-stat-value" th:text="${run.distance}">5 km</div>
+            </div>
+
+            <div class="run-stat">
+                <div class="run-stat-label">Duration</div>
+                <div class="run-stat-value" th:text="${run.duration.toHours() + ':' + (run.duration.toMinutesPart() < 10 ? '0' : '') + run.duration.toMinutesPart() + ':' + (run.duration.toSecondsPart() < 10 ? '0' : '') + run.duration.toSecondsPart()}">00:25:00</div>
+            </div>
+
+            <div class="run-stat">
+                <div class="run-stat-label">Avg Pace</div>
+                <div class="run-stat-value" th:text="${run.pace}">05:00 /km</div>
+            </div>
+
+        </div>
+
+        <div class="run-notes" style="margin-top: 20px;">
+            <strong>Description:</strong>
+            <p th:text="${#strings.isEmpty(run.description) ? 'No description' : run.description}">Felt strong today!</p>
+        </div>
+    </section>
+
+
+    <!-- Comments Section -->
+    <section class="comments-section">
+        <h2>Comments</h2>
+
+        <!-- No comments -->
+        <p th:if="${#lists.isEmpty(comments)}">No comments yet.</p>
+
+        <!-- List comments -->
+        <div th:each="comment : ${comments}">
+            <div class="comment">
+                <div class="comment-header">
+                    <span class="comment-author" th:text="${comment.user.username}">username</span>
+                    <span class="comment-date" th:text="${#temporals.format(run.createdOn, 'dd MMM YYYY HH:mm')}">14 Nov 2025, 08:00</span>
+                </div>
+                <div class="comment-body" th:text="${comment.content}">Great run!</div>
+
+                <!-- Delete button positioned on the right -->
+
+                <div th:if="${currentUser.id == user.id or currentUser.role.displayName == 'Admin' or comment.getUser().id.equals(currentUser.id)}" class="delete-btn-container">
+                    <form th:action="@{'/runs/' + ${run.id} + '/details/delete/' + ${comment.id}}" th:method="delete" style="display: inline;">
+                        <input type="hidden" name="_method" value="DELETE" />
+                        <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to delete this run?')">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Add Comment Form -->
+    <section class="add-comment-form">
+        <h2 style="margin-left: 0.3rem; font-size: 29px"><strong>Add a Comment</strong></h2>
+
+        <form th:action="@{'/runs/' + ${run.id} + '/comments'}" th:object="${addCommentRequest}" method="post">
+    <textarea th:field="*{content}"
+              style="margin-top: 1rem; resize: none; height: 60px; width: 100%"
+              placeholder="Write your comment..."
+              required></textarea>
+            <div th:if="${#fields.hasErrors('content')}" class="error-message">
+                <span th:errors="*{content}"></span>
+            </div>
+            <button type="submit">Post Comment</button>
+        </form>
+    </section>
+
+</main>
+
+</body>
+</html>

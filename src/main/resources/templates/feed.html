@@ -43,430 +43,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        /* Feed-specific styles */
-        .feed-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-            height: calc(100vh - 80px); /* Account for header height */
-        }
+    <link rel="stylesheet" href="/css/feed.css">
 
-        .feed-layout {
-            display: grid;
-            grid-template-columns: 320px 1fr; /* Increased from 280px to 320px */
-            gap: 2rem;
-            height: 100%;
-        }
-
-        @media (max-width: 768px) {
-            .feed-layout {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* Profile card styling - Made larger */
-        .profile-card {
-            background: radial-gradient(circle at top left, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 60%, rgba(255,255,255,0.03) 100%);
-            backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
-            -webkit-backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            box-shadow:
-                    inset 0 1px 0 rgba(255,255,255,0.25),
-                    0 8px 40px rgba(0,0,0,0.45),
-                    0 0 120px rgba(255,255,255,0.06);
-            border-radius: 20px;
-            padding: 2rem; /* Increased padding */
-            height: fit-content;
-            position: sticky;
-            top: 100px;
-        }
-
-        .avatar-lg {
-            width: 120px; /* Increased from 100px to 120px */
-            height: 120px; /* Increased from 100px to 120px */
-            border-radius: 50%;
-            overflow: hidden;
-            margin: 0 auto 1.5rem; /* Increased margin */
-            border: 2px solid rgba(212, 175, 55, 0.5);
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
-        }
-
-        .avatar-lg img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .profile-name {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            font-size: 1.5rem; /* Increased from 1.3rem */
-            color: #f9eecf;
-            text-align: center;
-            margin-bottom: 0.75rem; /* Increased margin */
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
-        }
-
-        .profile-status {
-            text-align: center;
-            margin-bottom: 1.5rem; /* Increased margin */
-        }
-
-        .active-profile {
-            background: rgba(0, 210, 106, 0.2);
-            color: #00d26a;
-            padding: 0.35rem 1rem; /* Slightly larger padding */
-            border-radius: 20px;
-            font-size: 0.8rem; /* Slightly larger font */
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .inactive-profile {
-            background: rgba(255, 59, 48, 0.2);
-            color: #ff3b30;
-            padding: 0.35rem 1rem; /* Slightly larger padding */
-            border-radius: 20px;
-            font-size: 0.8rem; /* Slightly larger font */
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        .profile-stats {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem; /* Increased gap */
-            margin-bottom: 1.5rem; /* Increased margin */
-        }
-
-        .profile-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 0.75rem; /* Increased padding */
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .profile-row:last-child {
-            border-bottom: none;
-        }
-
-        .profile-row .muted {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem; /* Slightly larger font */
-        }
-
-        .profile-row strong {
-            color: #f9eecf;
-            font-size: 1.1rem; /* Slightly larger font */
-            font-weight: 700;
-        }
-
-        /* Runs section styling with scroll */
-        .runs-section {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-            height: 100%;
-            overflow-y: auto; /* Enable vertical scrolling */
-            padding-right: 0.5rem; /* Space for scrollbar */
-        }
-
-        /* Custom scrollbar styling */
-        .runs-section::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .runs-section::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-
-        .runs-section::-webkit-scrollbar-thumb {
-            background: rgba(212, 175, 55, 0.5);
-            border-radius: 10px;
-        }
-
-        .runs-section::-webkit-scrollbar-thumb:hover {
-            background: rgba(212, 175, 55, 0.7);
-        }
-
-        .feed-card {
-            background: radial-gradient(circle at top left, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 60%, rgba(255,255,255,0.03) 100%);
-            backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
-            -webkit-backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            box-shadow:
-                    inset 0 1px 0 rgba(255,255,255,0.25),
-                    0 8px 40px rgba(0,0,0,0.45),
-                    0 0 120px rgba(255,255,255,0.06);
-            border-radius: 20px;
-            padding: 1.5rem;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .feed-card:hover {
-            transform: translateY(-5px);
-            box-shadow:
-                    inset 0 1px 0 rgba(255,255,255,0.25),
-                    0 12px 50px rgba(0,0,0,0.5),
-                    0 0 120px rgba(255,255,255,0.08);
-        }
-
-        .feed-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .avatar-sm {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(212, 175, 55, 0.2);
-            border: 1px solid rgba(212, 175, 55, 0.4);
-            color: #f9eecf;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .feed-user {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            color: #f9eecf;
-            font-size: 1.1rem;
-        }
-
-        .feed-sub {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-        }
-
-        .metrics {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        @media (max-width: 480px) {
-            .metrics {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .metric {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .metric-k {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.85rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .metric-v {
-            color: #f9eecf;
-            font-weight: 700;
-            font-size: 1.2rem;
-        }
-
-        .feed-actions {
-            display: flex;
-            gap: 1.5rem;
-            padding-top: 1rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .feed-actions span {
-            color: rgba(255, 255, 255, 0.7);
-            cursor: pointer;
-            transition: color 0.2s ease;
-            font-size: 0.9rem;
-        }
-
-        .feed-actions span:hover {
-            color: #f9eecf;
-        }
-
-        /* Header styling */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            background: radial-gradient(circle at top left, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 60%, rgba(255,255,255,0.03) 100%);
-            backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
-            -webkit-backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.22);
-            box-shadow:
-                    0 8px 40px rgba(0,0,0,0.45),
-                    0 0 120px rgba(255,255,255,0.06);
-        }
-
-        .logo {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 800;
-            font-size: 1.8rem;
-            color: #f9eecf;
-            text-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
-        }
-
-        .logo a {
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .strides-balance-header {
-            background: rgba(0, 210, 106, 0.2);
-            color: #00d26a;
-            border-radius: 12px;
-            padding: 8px 12px;
-            text-align: center;
-            border: 1px solid rgba(0, 210, 106, 0.3);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .strides-amount-header {
-            font-size: 20px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            display: block;
-        }
-
-        .strides-label-header {
-            font-family: 'Montserrat', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 12px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            letter-spacing: .2px;
-            padding: .75rem 1.25rem;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            cursor: pointer;
-        }
-
-        .btn-primary {
-            color: #1b1b1b;
-            background: linear-gradient(145deg, rgba(255,255,255,0.75) 0%, rgba(240,240,240,0.55) 100%);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2), inset 0 1px rgba(255,255,255,0.4);
-            border: 1px solid rgba(255,255,255,0.45);
-        }
-
-        .btn-primary:hover {
-            color: #1b1b1b;
-            background: linear-gradient(145deg, rgba(255,255,255,0.85) 0%, rgba(240,240,240,0.65) 100%);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3), inset 0 1px rgba(255,255,255,0.5);
-            transform: translateY(-1px);
-        }
-
-        .header-actions .avatar-sm {
-            width: 40px;
-            height: 40px;
-            font-size: 1rem;
-        }
-
-        /* Background elements */
-        .bg-layer {
-            position: fixed;
-            inset: 0;
-            z-index: -10;
-        }
-
-        .bg-layer img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .bg-layer::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.5);
-        }
-
-        .particles {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: -5;
-        }
-
-        .particles span {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            background: linear-gradient(
-                    to bottom right,
-                    rgba(255, 233, 175, 0.85),
-                    rgba(245, 231, 197, 0.4)
-            );
-            filter: drop-shadow(0 0 4px rgba(245, 231, 197, 0.6));
-            opacity: 0.75;
-            animation: float 12s ease-in-out infinite;
-            transform-origin: center;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 0.7;
-            }
-            50% {
-                transform: translateY(-20px) rotate(180deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(0) rotate(360deg);
-                opacity: 0.7;
-            }
-        }
-
-        /* Particle positioning */
-        .particles span:nth-child(1) { left: 12%; bottom: 20%; animation-duration: 12s; }
-        .particles span:nth-child(2) { left: 8%; bottom: 35%; animation-duration: 14s; }
-        .particles span:nth-child(3) { left: 20%; bottom: 28%; animation-duration: 16s; }
-        .particles span:nth-child(4) { left: 14%; bottom: 12%; animation-duration: 18s; }
-        .particles span:nth-child(5) { left: 26%; bottom: 22%; animation-duration: 20s; }
-        .particles span:nth-child(6) { left: 32%; bottom: 18%; animation-duration: 22s; }
-        .particles span:nth-child(7) { left: 5%; bottom: 50%; animation-duration: 19s; }
-        .particles span:nth-child(8) { left: 18%; bottom: 40%; animation-duration: 17s; }
-        .particles span:nth-child(9) { left: 28%; bottom: 30%; animation-duration: 23s; }
-        .particles span:nth-child(10) { left: 10%; bottom: 10%; animation-duration: 21s; }
-        .particles span:nth-child(11) { left: 40%; bottom: 25%; animation-duration: 15s; }
-        .particles span:nth-child(12) { left: 15%; bottom: 55%; animation-duration: 24s; }
-        .particles span:nth-child(13) { left: 22%; bottom: 15%; animation-duration: 19s; }
-        .particles span:nth-child(14) { left: 30%; bottom: 45%; animation-duration: 26s; }
-        .particles span:nth-child(15) { left: 7%; bottom: 65%; animation-duration: 22s; }
-        .particles span:nth-child(16) { left: 35%; bottom: 35%; animation-duration: 25s; }
-    </style>
 </head>
 <body class="min-h-screen overflow-x-hidden bg-black text-white font-open-sans">
 <!-- Background elements -->
@@ -490,7 +68,7 @@
             <span class="strides-label-header">Strides</span>
         </div>
 
-        <a class="btn btn-primary" th:href="@{'/runs/' + ${user.id} + '/add'}">ADD RUN</a>
+        <a class="btn btn-primary" th:href="@{'/runs/add'}">ADD RUN</a>
         <a class="btn btn-primary" href="/subscriptions">UPGRADE</a>
 
         <!-- 👇 Only visible to admins -->
@@ -508,16 +86,17 @@
 
 <!-- Main content -->
 <main class="feed-container">
-    <div class="feed-layout">
-        <!-- Profile section - Made larger -->
-        <aside class="profile-card">
+    <div class="feed-layout grid grid-cols-12 gap-6">
+
+        <!-- Profile section -->
+        <aside class="profile-card col-span-3">
             <div class="avatar-lg">
                 <a th:href="@{'/users/profile'}">
                     <img th:src="${#strings.isEmpty(user.profilePicture) ? 'https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg' : user.profilePicture}" alt="Profile picture">
                 </a>
             </div>
 
-            <a th:href="@{'/users/' + ${user.id} + '/profile'}">
+            <a th:href="@{'/users/profile'}">
                 <div class="profile-name" th:text="${user.username}">martin_gergov</div>
             </a>
             <div class="profile-status">
@@ -528,17 +107,26 @@
                 <div class="profile-row"><span class="muted">Total runs</span><strong th:text="${stats.totalRuns}">10</strong></div>
                 <div class="profile-row"><span class="muted">Total distance</span><strong th:text="${stats.totalDistance}">100 km</strong></div>
                 <div class="profile-row"><span class="muted">Total duration</span><strong th:text="${stats.totalDuration}">09:00:00</strong></div>
+                <div class="profile-row"><span class="muted">PB 1km</span><strong th:text="${stats.pb1km}">10</strong></div>
+                <div class="profile-row"><span class="muted">PB 5km</span><strong th:text="${stats.pb5km}">100 km</strong></div>
+                <div class="profile-row"><span class="muted">PB 10km</span><strong th:text="${stats.pb10km}">09:00:00</strong></div>
             </div>
         </aside>
 
-        <!-- Runs section with scrolling -->
-        <section class="runs-section">
+        <!-- Runs section -->
+        <section class="runs-section col-span-6">
             <article th:each="run : ${feedRuns}" class="feed-card">
                 <div class="feed-header">
-                    <div class="avatar-sm">👤</div>
+                    <a th:href="${'/runs/' + run.userId()}"> <div class="avatar-sm">
+                        <img th:src="${#strings.isEmpty(run.profilePic())
+                  ? 'https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg'
+                  : run.profilePic()}"
+                             alt="Profile picture">
+                    </div></a>
+
                     <div>
-                        <div class="feed-user" th:text="${run.username}">username</div>
-                        <div class="feed-sub" th:text="${run.title}">Recent Run</div>
+                        <a th:href="${'/runs/' + run.id() + '/details'}"><div class="feed-user" th:text="${run.title}">title</div></a>
+                        <a th:href="${'/runs/' + run.userId()}"><strong><div class="feed-sub" th:text="${run.username}">username</div></strong></a>
                     </div>
                 </div>
                 <div class="metrics">
@@ -556,11 +144,52 @@
                     </div>
                 </div>
                 <div class="feed-actions">
-                    <span>❤️ Like</span><span>💬 Comment</span><span>↗ Share</span>
+                    <form th:action="${'/runs/' + run.id + '/' + (run.likedByCurrentUser ? 'unlike' : 'like')}"
+                          method="post">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}">
+                        <button class="like-btn" th:classappend="${run.likedByCurrentUser} ? ' liked' : ''">
+                            <span class="heart-icon" th:text="${run.likedByCurrentUser} ? '❤️' : '🤍'"></span>
+                            <span th:text="${run.likesCount}"></span>
+                        </button>
+                    </form>
+
+                    <button class="comment-btn">💬 Comment</button>
+                    <button class="share-btn">↗ Share</button>
                 </div>
+
             </article>
         </section>
+
+        <aside class="leaderboard-card col-span-3">
+            <h2 class="leaderboard-title">Daily Leaderboard</h2>
+
+            <div class="leaderboard-list">
+                <div class="leaderboard-header">
+                    <span>#</span>
+                    <span>User</span>
+                    <span>Today</span>
+                </div>
+
+                <div class="leaderboard-row" th:each="entry, iter : ${leaderboard}">
+                    <span class="position" th:text="${iter.index + 1}">1</span>
+
+                    <div class="lb-user">
+                        <span th:text="${entry.username}">martin</span>
+                    </div>
+
+                    <span class="today-km"
+                          th:text="${entry.kilometers() + ' km'}">12 km</span>
+                </div>
+
+                <div th:if="${#lists.isEmpty(leaderboard)}" class="leaderboard-empty">
+                    No activity today.
+                </div>
+            </div>
+        </aside>
+
+
     </div>
 </main>
+
 </body>
 </html>

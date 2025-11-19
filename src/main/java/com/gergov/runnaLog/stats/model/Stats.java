@@ -4,7 +4,6 @@ import com.gergov.runnaLog.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

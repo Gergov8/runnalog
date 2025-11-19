@@ -1,7 +1,6 @@
 package com.gergov.runnaLog.user.property;
 
 import com.gergov.runnaLog.user.model.UserCountry;
-import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
@@ -27,8 +26,4 @@ public class UserProperties {
         private UserCountry country;
     }
 
-//    @PostConstruct
-//    public void test() {
-//        System.out.println();
-//    }
 }
