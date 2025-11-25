@@ -76,6 +76,11 @@
             <a class="btn btn-primary" href="/users">MANAGE USERS</a>
         </div>
 
+        <!-- Show Personal Coach for Elite users -->
+        <div th:if="${hasEliteSubscription || user.role.displayName.equals('Admin')}">
+            <a class="btn btn-primary" th:href="@{/training/plans}">PERSONAL COACH</a>
+        </div>
+
         <a class="btn btn-primary" href="/logout">LOGOUT</a>
         <div class="avatar-sm" title="You">
             <a th:href="@{'/users/profile'}">.</a>

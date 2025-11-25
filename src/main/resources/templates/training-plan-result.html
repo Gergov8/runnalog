@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your Training Plan - RunnaLog</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            DEFAULT: '#D4AF37',
+                            soft: '#E6C967',
+                            light: '#F5E7C5'
+                        }
+                    },
+                    fontFamily: {
+                        mont: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="min-h-screen bg-black text-white font-open-sans">
+
+<!-- Background -->
+<div class="fixed inset-0 -z-10">
+    <img th:src="@{/images/background.png}" alt="Background" class="w-full h-full object-cover opacity-50" />
+</div>
+
+<!--&lt;!&ndash; Loading State (shown only when NO plan data) &ndash;&gt;-->
+<!--<div th:if="${planJson == null}" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">-->
+<!--    <div class="text-center">-->
+<!--        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gold mx-auto mb-4"></div>-->
+<!--        <p class="text-gold-light text-lg">Loading your training plan...</p>-->
+<!--        <p class="text-gray-400 mt-2">If this takes too long, <a th:href="@{/training/plans}" class="text-gold-soft underline">go back</a> and try again.</p>-->
+<!--    </div>-->
+<!--</div>-->
+
+<!-- Main Content (shown only when plan data EXISTS) -->
+<div th:if="${planJson != null}" class="container mx-auto px-4 py-8 max-w-4xl">
+
+    <!-- Header -->
+    <header class="text-center mb-8">
+        <h1 class="text-4xl font-bold text-gold-light mb-2" th:text="${pageTitle}">Your Training Plan</h1>
+        <p class="text-gray-300">Customized training plan based on your goals</p>
+    </header>
+
+    <!-- Success Message -->
+    <div th:if="${success}" class="bg-green-900/50 border border-green-600 rounded-lg p-4 mb-6">
+        <div class="flex items-center">
+            <span class="text-green-400 text-lg mr-2">✓</span>
+            <span th:text="${success}" class="text-green-300"></span>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div th:if="${error}" class="bg-red-900/50 border border-red-600 rounded-lg p-4 mb-6">
+        <div class="flex items-center">
+            <span class="text-red-400 text-lg mr-2">✗</span>
+            <span th:text="${error}" class="text-red-300"></span>
+        </div>
+    </div>
+
+    <!-- Plan Summary Card -->
+    <div class="bg-gray-900/80 backdrop-blur-sm rounded-xl border border-gray-700 p-6 mb-6"
+         th:if="${plan != null}">
+        <h2 class="text-2xl font-bold text-gold-light mb-4">Plan Summary</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="text-center p-4 bg-gray-800/50 rounded-lg">
+                <div class="text-gold-soft text-sm mb-1">Goal Distance</div>
+                <div class="text-2xl font-bold text-white"
+                     th:text="${plan.distanceKm != null} ? ${plan.distanceKm + ' km'}">
+                    5 km
+                </div>
+            </div>
+            <div class="text-center p-4 bg-gray-800/50 rounded-lg">
+                <div class="text-gold-soft text-sm mb-1">Plan Level</div>
+                <div class="text-2xl font-bold text-white"
+                     th:text="${plan.planLevel != null} ? ${plan.planLevel}">
+                    RECREATIONAL
+                </div>
+            </div>
+            <div class="text-center p-4 bg-gray-800/50 rounded-lg">
+                <div class="text-gold-soft text-sm mb-1">Training Days</div>
+                <div class="text-2xl font-bold text-white"
+                     th:text="${plan.daysPerWeek != null} ? ${plan.daysPerWeek + ' days/week'}">
+                    4 days/week
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gray-900/80 backdrop-blur-sm rounded-xl border border-gray-700 p-6 mb-6">
+        <h2 class="text-2xl font-bold text-gold-light mb-4">
+            Your <span th:text="${planJson.get('weeks').size()}">4</span>-Week Training Plan
+        </h2>
+
+        <div th:each="week : ${planJson.get('weeks')}" class="mb-6">
+            <h3 class="text-xl font-semibold text-gold-soft mb-3">
+                Week <span th:text="${week.get('week')}">1</span>
+            </h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div th:each="day : ${week.get('days')}"
+                     class="bg-gray-800/50 p-3 rounded-lg hover:bg-gray-700/50 transition-colors">
+                    <div class="text-gold-light font-semibold"
+                         th:text="${day.get('dayOfWeek')}">Monday</div>
+                    <div class="text-sm text-gray-300">
+                        <span th:text="${day.get('type')}">Easy</span>:
+                        <span th:text="${day.get('description')}">30 min easy run</span>
+                    </div>
+                    <div class="text-xs text-gray-400 mt-1"
+                         th:if="${day.get('durationMin') != null}">
+                        Duration: <span th:text="${day.get('durationMin')}">45</span> min
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+        <a th:href="@{/training/plans}" class="bg-gold text-black font-semibold py-3 px-6 rounded-lg text-center hover:bg-gold-soft transition-colors">
+            Create Another Plan
+        </a>
+        <a th:href="@{/feed}" class="bg-gray-700 text-white font-semibold py-3 px-6 rounded-lg text-center hover:bg-gray-600 transition-colors">
+            Back to Feed
+        </a>
+        <button onclick="window.print()" class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
+            Print Plan
+        </button>
+    </div>
+
+    <!-- Training Tips -->
+    <div class="mt-8 bg-gray-900/80 backdrop-blur-sm rounded-xl border border-gray-700 p-6 mx-auto max-w-2xl">
+        <h3 class="text-xl font-bold text-gold-light mb-3 text-center">Training Tips</h3>
+        <ul class="list-disc list-inside text-gray-300 space-y-2">
+            <li>Listen to your body and adjust intensity as needed</li>
+            <li>Stay hydrated and maintain proper nutrition</li>
+            <li>Incorporate strength training 2x per week</li>
+            <li>Get adequate sleep for recovery</li>
+            <li>Use proper running shoes and form</li>
+        </ul>
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="mt-12 py-6 text-center text-gray-500">
+    <p>© 2025 RunnaLog - Your Personalized Training Platform</p>
+</footer>
+
+</body>
+</html>

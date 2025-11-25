@@ -1,6 +1,9 @@
 package com.gergov.runnaLog.user.service;
 
 import com.gergov.runnaLog.event.SuccessfulRegistrationEvent;
+import com.gergov.runnaLog.exception.UserEmailAlreadyExistsException;
+import com.gergov.runnaLog.exception.UserNotFoundException;
+import com.gergov.runnaLog.exception.UsernameAlreadyExistsException;
 import com.gergov.runnaLog.run.repository.RunRepository;
 import com.gergov.runnaLog.security.UserData;
 import com.gergov.runnaLog.stats.service.StatsService;
@@ -15,7 +18,6 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,7 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,16 +41,20 @@ public class UserService implements UserDetailsService {
     private final SubscriptionService subscriptionService;
     private final ApplicationEventPublisher eventPublisher;
     private final RunRepository runRepository;
+    private final List<DailyKmDto> leaderboardCache;
 
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, StatsService statsService, SubscriptionService subscriptionService, ApplicationEventPublisher eventPublisher, RunRepository runRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, StatsService statsService,
+                       SubscriptionService subscriptionService, ApplicationEventPublisher eventPublisher,
+                       RunRepository runRepository, List<DailyKmDto> leaderboardCache) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.statsService = statsService;
         this.subscriptionService = subscriptionService;
         this.eventPublisher = eventPublisher;
         this.runRepository = runRepository;
+        this.leaderboardCache = leaderboardCache;
     }
 
     @Transactional
@@ -57,12 +63,12 @@ public class UserService implements UserDetailsService {
 
         Optional<User> optionalUserName = userRepository.findByUsername(registerRequest.getUsername());
         if (optionalUserName.isPresent()) {
-            throw new RuntimeException("User with [%s] username already exists.".formatted(registerRequest.getUsername()));
+            throw new UsernameAlreadyExistsException("User with [%s] username already exists.".formatted(registerRequest.getUsername()));
         }
 
         Optional<User> optionalUserEmail = userRepository.findByEmail(registerRequest.getEmail());
         if (optionalUserEmail.isPresent()) {
-            throw new RuntimeException("User with [%s] email already exists.".formatted(registerRequest.getEmail()));
+            throw new UserEmailAlreadyExistsException("This email is used by another account.");
         }
 
         User user = User.builder()
@@ -91,19 +97,19 @@ public class UserService implements UserDetailsService {
         log.info("New user profile was registered in the system for user [%s].".formatted(registerRequest.getUsername()));
     }
 
-    @Cacheable("users")
+//    @Cacheable("users")
     public List<User> getAll() {
 
         return userRepository.findAll();
     }
 
-    @Cacheable("usersById")
+//    @Cacheable("usersById")
     public User getById(UUID id) {
 
-        return userRepository.findById(id).orElseThrow(() -> new RuntimeException("User with [%s] id does not exist.".formatted(id)));
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with [%s] id does not exist.".formatted(id)));
     }
 
-    @CacheEvict(value = {"users", "usersById", "userDataByUsername"})
+//    @CacheEvict(value = {"users", "usersById", "userDataByUsername"})
     public void updateUserProfile(UUID id, EditProfileRequest editProfileRequest) {
         User existingUser = getById(id);
 
@@ -128,7 +134,7 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    @CacheEvict(value = {"users", "usersById", "userDataByUsername"}, allEntries = true)
+//    @CacheEvict(value = {"users", "usersById", "userDataByUsername"}, allEntries = true)
     public void deleteUser(UUID userId, UUID currentUserId) {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty() || !userOpt.get().getId().equals(userId)) {
@@ -143,36 +149,50 @@ public class UserService implements UserDetailsService {
         log.info("Admin deleted user [{}]", userOpt.get().getUsername());
     }
 
-    @Cacheable("userDataByUsername")
+//    @Cacheable("userDataByUsername")
     public UserData findByUsername(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Username not found."));
         return new UserData(user.getId(), username, user.getPassword(), user.getRole(), user.isActive());
 
     }
 
-    private List<DailyKmDto> leaderboardCache = new ArrayList<>();
-
     public List<DailyKmDto> getLeaderboard() {
-        return new ArrayList<>(leaderboardCache);
+        return Collections.unmodifiableList(leaderboardCache);
     }
 
     public void recalculateLeaderboard() {
+        // CLEAR the cache first!
+        leaderboardCache.clear();
+
         List<Object[]> results = runRepository.findUsersSortedByTodayKm();
-        List<DailyKmDto> temp = new ArrayList<>();
 
         results.forEach(row -> {
             UUID userId = (UUID) row[0];
             double km = (Double) row[1];
             User user = getById(userId);
-            temp.add(new DailyKmDto(userId, user.getUsername(), km));
+            leaderboardCache.add(new DailyKmDto(userId, user.getUsername(), km));
         });
 
-        leaderboardCache = temp;
+        log.info("Leaderboard recalculated with {} users", leaderboardCache.size());
     }
-
 
     public void resetLeaderboard() {
         leaderboardCache.clear();
+        log.info("Leaderboard reset");
+    }
+
+//    @CacheEvict(value = "users", allEntries = true)
+    public void switchRole(UUID userId) {
+
+        User user = getById(userId);
+
+        if (user.getRole() == UserRole.USER) {
+            user.setRole(UserRole.ADMIN);
+        } else {
+            user.setRole(UserRole.USER);
+        }
+
+        userRepository.save(user);
     }
 }
 

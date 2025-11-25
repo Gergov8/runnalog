@@ -471,6 +471,15 @@
                         </button>
                     </form>
                 </td>
+                <td sec:authorize="hasRole('ADMIN')" data-label="Actions">
+                    <form th:action="@{'/users' + '/role/' + ${user.id} }" th:method="put" style="display: inline;">
+                        <input type="hidden" name="_method" value="PUT" />
+                        <button type="submit" class="btn-delete" onclick="return confirm('Are you sure you want to change the role of this user?')">
+                            Change role
+                        </button>
+                    </form>
+                </td>
+
             </tr>
             </tbody>
         </table>

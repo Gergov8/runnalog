@@ -123,4 +123,13 @@ public class UserController {
 
         return modelAndView;
     }
+
+    @PutMapping("/role/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String switchUserRole(@PathVariable UUID userId) {
+
+        userService.switchRole(userId);
+
+        return "redirect:/users";
+    }
 }

@@ -97,6 +97,37 @@ public class SubscriptionService {
         return true;
     }
 
+    public boolean hasActiveEliteSubscription(User user) {
+        if (user == null) {
+            return false;
+        }
 
+        // Get the latest active subscription for the user
+        Subscription activeSubscription = subscriptionRepository.findLatestActiveByUser(user);
 
-}
+        return activeSubscription != null &&
+                activeSubscription.getType() == SubscriptionType.ELITE &&
+                activeSubscription.getStatus() == SubscriptionStatus.ACTIVE &&
+                activeSubscription.getExpiryOn().isAfter(LocalDateTime.now());
+        }
+
+        public boolean hasActiveSubscriptionOfType(User user, SubscriptionType type) {
+            if (user == null) {
+                return false;
+            }
+
+         Subscription activeSubscription = subscriptionRepository.findLatestActiveByUser(user);
+
+            return activeSubscription != null &&
+                    activeSubscription.getType() == type &&
+                    activeSubscription.getStatus() == SubscriptionStatus.ACTIVE &&
+                    activeSubscription.getExpiryOn().isAfter(LocalDateTime.now());
+        }
+
+        public Subscription getActiveSubscription(User user) {
+            if (user == null) {
+                return null;
+            }
+            return subscriptionRepository.findLatestActiveByUser(user);
+        }
+    }

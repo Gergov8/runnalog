@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Training Plans - RunnaLog</title>
+
+    <!-- Your existing CSS/JS links -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            DEFAULT: '#D4AF37',
+                            soft: '#E6C967',
+                            light: '#F5E7C5'
+                        }
+                    },
+                    fontFamily: {
+                        poppins: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        mont: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                        roboCond: ['Roboto Condensed', 'ui-sans-serif', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" th:href="@{/css/training-plans.css}" />
+</head>
+<body class="min-h-screen overflow-x-hidden bg-black text-white font-open-sans">
+<!-- Corner vignette effect -->
+<div class="corner-veil"></div>
+
+<!-- Floating particles -->
+<div class="particles">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+</div>
+
+<!-- Parallax background layer -->
+<div id="bg-layer" class="fixed inset-0 -z-10">
+    <img th:src="@{/images/background.png}" alt="Training Background" class="w-full h-full object-cover will-change-transform" />
+    <div class="absolute inset-0 bg-black/50"></div>
+</div>
+
+<!-- Main Container -->
+<div class="training-container">
+    <!-- Close button -->
+    <a th:href="@{/feed}" class="close-btn" aria-label="Close">×</a>
+
+    <div class="training-content">
+        <header class="training-header">
+            <h1 class="training-title" th:text="${pageTitle ?: 'Training Plans'}">Training Plans</h1>
+            <p class="training-subtitle">Create and manage your personalized running plans</p>
+        </header>
+
+        <!-- Display success/error messages -->
+        <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <!-- Create Plan Form -->
+        <div class="form-section">
+            <h2 class="section-title">Create New Plan</h2>
+            <form class="training-form"
+                  th:action="@{/training/create}"
+                  th:object="${createPlanRequest}"
+                  method="post">
+
+
+            <div class="form-group">
+                    <label for="distanceKm" class="form-label">Plan Level</label>
+                    <div class="select-wrapper">
+                        <select id="distanceKm" th:field="*{distanceKm}" class="form-input" required>
+                            <option value="">Select distance goal</option>
+                            <option value="5">5km</option>
+                            <option value="10">10km</option>
+                            <option value="21.1">21.1km</option>
+                            <option value="42.2">42.2km</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="daysPerWeek" class="form-label">Days per Week</label>
+                    <div class="select-wrapper">
+                        <select id="daysPerWeek" th:field="*{daysPerWeek}" class="form-input" required>
+                            <option value="">Select training days</option>
+                            <option value="4">4 days</option>
+                            <option value="5">5 days</option>
+                            <option value="6">6 days</option>
+                            <option value="7">7 days</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="planLevel" class="form-label">Plan Level</label>
+                    <div class="select-wrapper">
+                        <select id="planLevel" th:field="*{planLevel}" class="form-input" required>
+                            <option value="">Select plan level</option>
+                            <option value="RECREATIONAL">Recreational</option>
+                            <option value="COMPETITIVE">Competitive</option>
+                            <option value="ELITE">Elite</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        Create Training Plan
+                    </button>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- Manage Existing Plans -->
+        <!-- User Plans Section -->
+        <div class="form-section" th:if="${userPlans != null and !userPlans.isEmpty()}">
+            <h2 class="section-title">Your Training Plans
+                <span class="badge" th:text="'(' + ${plansCount} + ')'" th:if="${plansCount > 0}"></span>
+            </h2>
+            <div class="plans-grid">
+                <div th:each="userPlan : ${userPlans}" class="plan-card">
+                    <h3 th:text="${userPlan.distanceKm} + 'km ' + ${userPlan.planLevel} + ' Plan'">10km RECREATIONAL Plan</h3>
+                    <p th:text="'Level: ' + ${userPlan.planLevel}">Level: RECREATIONAL</p>
+                    <p th:text="'Days per week: ' + ${userPlan.daysPerWeek}">Days: 4</p>
+                    <p th:text="'Created: ' + ${#temporals.format(userPlan.createdAt, 'dd MMM yyyy')}"
+                       th:if="${userPlan.createdAt != null}">Created: 23 Nov 2025</p>
+                    <div class="plan-actions">
+                        <a th:href="@{/training/plan-result(planId=${userPlan.id})}"
+                           class="btn btn-small">
+                            View
+                        </a>
+                        <form th:action="@{/training/delete/{id}(id=${userPlan.id})}"
+                              method="post"
+                              style="display: inline;"
+                              th:onsubmit="return confirm('Are you sure you want to delete this plan?')">
+                            <button type="submit" class="btn btn-small btn-danger">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- No Plans Message -->
+        <div class="form-section" th:if="${userPlans != null and userPlans.isEmpty()}">
+            <h2 class="section-title">Your Training Plans</h2>
+            <div class="no-plans-message">
+                <p>You don't have any training plans yet. Create your first plan above!</p>
+            </div>
+        </div>
+<!--            &lt;!&ndash; Regenerate Plan Form &ndash;&gt;-->
+<!--            <form class="action-form" th:action="@{/api/v1/plans/{id}/regenerate(id=${planId})}" method="post">-->
+<!--                <div class="form-row">-->
+<!--                    <input-->
+<!--                            type="text"-->
+<!--                            name="planId"-->
+<!--                    class="form-input"-->
+<!--                    placeholder="Enter Plan ID to regenerate"-->
+<!--                    required-->
+<!--                    />-->
+<!--                    <button type="submit" class="btn btn-secondary">-->
+<!--                        Regenerate-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--            </form>-->
+
+<!--            &lt;!&ndash; Delete Plan Form &ndash;&gt;-->
+<!--            <form class="action-form" th:action="@{/api/v1/plans/{id}(id=${planId})}" method="post">-->
+<!--                <input type="hidden" name="_method" value="delete" />-->
+<!--                <div class="form-row">-->
+<!--                    <input-->
+<!--                            type="text"-->
+<!--                            name="planId"-->
+<!--                    class="form-input"-->
+<!--                    placeholder="Enter Plan ID to delete"-->
+<!--                    required-->
+<!--                    />-->
+<!--                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this plan?')">-->
+<!--                        Delete Plan-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--            </form>-->
+
+        <!-- Test Connection -->
+        <div class="test-section">
+            <h2 class="section-title">Service Status</h2>
+            <div class="status-container">
+                <a th:href="@{/api/v1/plans/say-hello}" class="btn btn-outline" id="testConnection">
+                    Test Connection
+                </a>
+                <div id="connectionStatus" class="status-message" th:if="${connectionStatus}" th:text="${connectionStatus}"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<section class="athlete-section">
+    <div id="athlete-wrap" class="athlete-container">
+        <img id="athlete" th:src="@{/images/bros.png}" alt="Runner Training" class="athlete-image" />
+    </div>
+</section>
+<footer class="site-footer" role="contentinfo">
+    <p>© 2025 RunnaLog Training Microservice - Built with Spring Boot</p>
+</footer>
+
+<script th:src="@{/js/script.js}"></script>
+<script>
+    document.getElementById("planForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const form = new FormData(e.target);
+
+        const body = {
+            userId: "00000000-0000-0000-0000-000000000000",
+            distanceKm: parseFloat(form.get("distanceKm")),
+            planLevel: form.get("planLevel"),
+            daysPerWeek: parseInt(form.get("daysPerWeek")),
+        };
+
+        const response = await fetch("http://localhost:8081/api/v1/plans", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        });
+
+        const data = await response.json();
+        console.log(data);
+    });
+</script>
+</body>
+</html>

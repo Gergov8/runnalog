@@ -4,6 +4,8 @@ import com.gergov.runnaLog.job.LeaderboardScheduler;
 import com.gergov.runnaLog.run.service.RunService;
 import com.gergov.runnaLog.security.UserData;
 import com.gergov.runnaLog.stats.model.Stats;
+import com.gergov.runnaLog.subscription.model.Subscription;
+import com.gergov.runnaLog.subscription.service.SubscriptionService;
 import com.gergov.runnaLog.user.model.User;
 import com.gergov.runnaLog.user.service.UserService;
 import com.gergov.runnaLog.web.dto.DailyKmDto;
@@ -28,13 +30,15 @@ public class IndexController {
     private final UserService userService;
     private final RunService runService;
     private final LeaderboardScheduler leaderboardScheduler;
+    private final SubscriptionService subscriptionService;
 
 
     @Autowired
-    public IndexController(UserService userService, RunService runService, LeaderboardScheduler leaderboardScheduler) {
+    public IndexController(UserService userService, RunService runService, LeaderboardScheduler leaderboardScheduler, SubscriptionService subscriptionService) {
         this.userService = userService;
         this.runService = runService;
         this.leaderboardScheduler = leaderboardScheduler;
+        this.subscriptionService = subscriptionService;
     }
 
     @GetMapping("/")
@@ -98,14 +102,20 @@ public class IndexController {
         Stats stats = user.getStats();
         List<DailyKmDto> leaderboard = userService.getLeaderboard();
 
+        // Check if user has active ELITE subscription using the service
+        boolean hasEliteSubscription = subscriptionService.hasActiveEliteSubscription(user);
+
+        // Optional: Get the active subscription for more details
+        Subscription activeSubscription = subscriptionService.getActiveSubscription(user);
 
         ModelAndView modelAndView = new ModelAndView();
-
         modelAndView.setViewName("feed");
         modelAndView.addObject("user", user);
         modelAndView.addObject("leaderboard", leaderboard);
         modelAndView.addObject("stats", stats);
         modelAndView.addObject("feedRuns", runService.getFeed(user));
+        modelAndView.addObject("hasEliteSubscription", hasEliteSubscription);
+        modelAndView.addObject("activeSubscription", activeSubscription);
 
         return modelAndView;
     }

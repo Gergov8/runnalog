@@ -14,4 +14,7 @@ public interface SubscriptionRepository extends CrudRepository<Subscription, UUI
 
     @Query("SELECT s FROM Subscription s WHERE s.user = :user ORDER BY s.createdOn DESC LIMIT 1")
     Subscription findLatestByUser(@Param("user") User user);
+
+    @Query("SELECT s FROM Subscription s WHERE s.user = :user AND s.status = 'ACTIVE' ORDER BY s.createdOn DESC")
+    Subscription findLatestActiveByUser(@Param("user") User user);
 }
