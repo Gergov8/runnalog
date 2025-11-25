@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Error - RunnaLog</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            DEFAULT: '#D4AF37',
+                            soft: '#E6C967',
+                            light: '#F5E7C5'
+                        }
+                    },
+                    fontFamily: {
+                        mont: ['Montserrat', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        .error-glow {
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+        }
+        .pulse-gold {
+            animation: pulse-gold 2s infinite;
+        }
+        @keyframes pulse-gold {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-black text-white font-open-sans">
+
+<!-- Background -->
+<div class="fixed inset-0 -z-10">
+    <img th:src="@{/images/background.png}" alt="Background" class="w-full h-full object-cover opacity-50" />
+</div>
+
+<!-- Main Container -->
+<div class="container mx-auto px-4 py-8 max-w-4xl min-h-screen flex items-center justify-center">
+    <div class="text-center w-full">
+
+        <!-- Error Title -->
+        <h1 class="text-6xl font-bold text-gold-light error-glow mb-4" th:text="${errorTitle ?: 'Error'}">
+            Oops!
+        </h1>
+
+        <!-- Error Code -->
+        <div class="mb-6">
+            <span class="inline-block bg-red-900/50 text-red-300 px-4 py-2 rounded-lg border border-red-600/50 text-sm font-mono"
+                  th:text="${status ?: '500'}">
+                Error 500
+            </span>
+        </div>
+
+        <!-- Error Message -->
+        <div class="bg-gray-900/80 backdrop-blur-sm rounded-xl border border-gray-700 p-6 mb-8 max-w-2xl mx-auto">
+            <h2 class="text-2xl font-bold text-gold-light mb-4">
+                Something went wrong
+            </h2>
+            <p class="text-gray-300 text-lg mb-4" th:text="${errorMessage ?: 'An unexpected error occurred while processing your request.'}">
+                We apologize for the inconvenience. Please try again later.
+            </p>
+
+            <!-- Technical Details (for development) -->
+            <div th:if="${timestamp}" class="mt-6 p-4 bg-gray-800/50 rounded-lg border border-gray-600/50">
+                <h3 class="text-gold-soft font-semibold mb-2">Technical Details</h3>
+                <div class="text-left text-sm text-gray-400 space-y-1">
+                    <div><span class="text-gold-soft">Time:</span> <span th:text="${timestamp}"></span></div>
+                    <div th:if="${path}"><span class="text-gold-soft">Path:</span> <span th:text="${path}"></span></div>
+                    <div th:if="${error}"><span class="text-gold-soft">Exception:</span> <span th:text="${error}"></span></div>
+                    <div th:if="${message}"><span class="text-gold-soft">Message:</span> <span th:text="${message}"></span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <button onclick="window.history.back()" class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors">
+                Go Back
+            </button>
+        </div>
+
+        <!-- Support Information -->
+        <div class="mt-8 bg-gray-900/80 backdrop-blur-sm rounded-xl border border-gray-700 p-6 mx-auto max-w-2xl">
+            <h3 class="text-xl font-bold text-gold-light mb-3">Need Help?</h3>
+            <p class="text-gray-300 mb-4">
+                If this problem persists, please contact our support team.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="mailto:support@runnalog.com" class="text-gold-soft hover:text-gold-light transition-colors">
+                    ✉️ support@runnalog.com
+                </a>
+                <span class="text-gray-500 hidden sm:block">|</span>
+                <a th:href="@{/}" class="text-gold-soft hover:text-gold-light transition-colors">
+                    🏠 Return Home
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Footer -->
+<footer class="mt-12 py-6 text-center text-gray-500">
+    <p>© 2025 RunnaLog - Your Personalized Training Platform</p>
+</footer>
+
+</body>
+</html>
