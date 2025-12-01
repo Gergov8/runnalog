@@ -1,5 +1,6 @@
 package com.gergov.runnaLog.subscription.repository;
 
+import com.gergov.runnaLog.security.UserData;
 import com.gergov.runnaLog.subscription.model.Subscription;
 import com.gergov.runnaLog.user.model.User;
 import org.springframework.data.jpa.repository.Query;

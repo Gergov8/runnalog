@@ -32,26 +32,17 @@ public class UserController {
         this.userService = userService;
     }
 
-    // GET /users/{id}/profile - View profile page
     @GetMapping("/profile")
     public ModelAndView getProfilePage(@AuthenticationPrincipal UserData userData) {
-        
-        User user = userService.getById(userData.getId());
 
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("profile");
+        User user = userService.getById(userData.getId());
 
         Stats stats = user.getStats();
         List<Run> runs = user.getRuns();
         List<Subscription> subs = user.getSubscriptions();
         LocalDateTime date = LocalDateTime.now();
-        modelAndView.addObject("stats", stats);
-        modelAndView.addObject("runs", runs);
-        modelAndView.addObject("subs", subs);
-        modelAndView.addObject("date", date);
-        modelAndView.addObject("user", user);
 
-        return modelAndView;
+        return getProfilePageModelAndView(stats, runs, subs, date, user);
     }
 
     @DeleteMapping("/delete/{userId}")
@@ -66,16 +57,14 @@ public class UserController {
         return new ModelAndView("redirect:/users");
     }
 
-    // GET /users/{id}/profile/edit - Show edit profile form
     @GetMapping("/profile/edit")
     public ModelAndView getProfileEditPage(@AuthenticationPrincipal UserData userData) {
 
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.setViewName("edit-profile"); // This should match your edit profile template name
+        modelAndView.setViewName("edit-profile");
 
         User user = userService.getById(userData.getId());
 
-        // Pre-populate the form with current user data
         EditProfileRequest editProfileRequest = EditProfileRequest.builder()
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
@@ -88,13 +77,12 @@ public class UserController {
         return modelAndView;
     }
 
-    // POST/PUT /users/{id}/profile - Handle profile update form submission
-    @PostMapping("/profile") // You can use @PutMapping if you prefer, but POST is more common for forms
+    @PostMapping("/profile")
     public ModelAndView updateProfile(@Valid @ModelAttribute EditProfileRequest editProfileRequest,
                                       BindingResult bindingResult,
                                       @AuthenticationPrincipal UserData userData,
                                       RedirectAttributes redirectAttributes) {
-        
+
         User user = userService.getById(userData.getId());
 
         if (bindingResult.hasErrors()) {
@@ -106,7 +94,6 @@ public class UserController {
 
         userService.updateUserProfile(userData.getId(), editProfileRequest);
 
-        // Add success message
         redirectAttributes.addFlashAttribute("success", "Profile updated successfully!");
 
         return new ModelAndView("redirect:/users/profile");
@@ -115,6 +102,7 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ModelAndView getUsers() {
+
         List<User> users = userService.getAll();
 
         ModelAndView modelAndView = new ModelAndView();
@@ -131,5 +119,18 @@ public class UserController {
         userService.switchRole(userId);
 
         return "redirect:/users";
+    }
+
+    private static ModelAndView getProfilePageModelAndView(Stats stats, List<Run> runs, List<Subscription> subs, LocalDateTime date, User user) {
+
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName("profile");
+        modelAndView.addObject("stats", stats);
+        modelAndView.addObject("runs", runs);
+        modelAndView.addObject("subs", subs);
+        modelAndView.addObject("date", date);
+        modelAndView.addObject("user", user);
+
+        return modelAndView;
     }
 }

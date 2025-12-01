@@ -481,6 +481,12 @@
             <tbody>
 
             <tr th:each="run : ${runs}">
+
+                <div th:if="${
+                    run.visibility.name() != 'PRIVATE'
+                    or loggedUser.role.name() == 'ADMIN'
+                    or run.user.id == loggedUser.id}">
+
                 <td data-label="Id" th:text="${run.id}" th:href="${'/runs/' + run.id + '/details'}">1</td>
                 <td data-label="Title" th:text="${run.title}">Morning run</td>
                 <td data-label="Distance" th:text="${run.distance + ' km'}">10 km</td>
@@ -503,6 +509,7 @@
                         </button>
                     </form>
                 </td>
+                </div>
             </tr>
             </tbody>
         </table>

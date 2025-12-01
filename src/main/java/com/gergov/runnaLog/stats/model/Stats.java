@@ -1,5 +1,6 @@
 package com.gergov.runnaLog.stats.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gergov.runnaLog.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +22,7 @@ public class Stats {
 
     @OneToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 
     @Column(nullable = false)

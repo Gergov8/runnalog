@@ -28,7 +28,7 @@ public class LikeService {
     }
 
     @Transactional
-    @CacheEvict(value = "likesCount", allEntries = true)
+    @CacheEvict(value = {"likesCount", "feed"}, allEntries = true)
     public void likeRun(UUID runId, User user) {
         Optional<Run> runOpt = runRepository.findById(runId);
         if (runOpt.isEmpty()) {
@@ -51,7 +51,7 @@ public class LikeService {
     }
 
     @Transactional
-    @CacheEvict(value = "likesCount", allEntries = true)
+    @CacheEvict(value = {"likesCount", "feed"}, allEntries = true)
     public void unlikeRun(UUID runId, User user) {
         Optional<Run> runOpt = runRepository.findById(runId);
         if (runOpt.isEmpty()) {

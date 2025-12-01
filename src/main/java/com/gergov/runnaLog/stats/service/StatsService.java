@@ -5,10 +5,12 @@ import com.gergov.runnaLog.run.repository.RunRepository;
 import com.gergov.runnaLog.stats.model.Stats;
 import com.gergov.runnaLog.stats.repository.StatsRepository;
 import com.gergov.runnaLog.user.model.User;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -27,6 +29,7 @@ public class StatsService {
         this.runRepository = runRepository;
     }
 
+    @Transactional
     public void createDefaultStats(User user) {
 
         Stats stats = Stats.builder()
@@ -118,9 +121,25 @@ public class StatsService {
 
     public void updateUserStatsAfterDeleteRun(User user, Double distance, long totalSeconds) {
         Stats stats = user.getStats();
+
+        int totalRuns = stats.getTotalRuns() - 1;
+        if (totalRuns < 0) {
+            stats.setTotalRuns(0);
+        }
         stats.setTotalRuns(stats.getTotalRuns() - 1);
+
+        double totalDistance = stats.getTotalDistance() - distance;
+        if (totalDistance < 0) {
+            stats.setTotalDistance(0.0);
+        }
         stats.setTotalDistance(stats.getTotalDistance() - distance);
+
+        Duration totalDuration = Duration.ofMinutes(stats.getTotalDuration() - (totalSeconds/60));
+        if (totalDuration.isNegative()) {
+            stats.setTotalDuration(0);
+        }
         stats.setTotalDuration((int) (stats.getTotalDuration() - totalSeconds/60));
+
         stats.setLastActivity(LocalDateTime.now());
 
         updatePersonalBestsAfterDeleteRun(stats, user);
@@ -142,8 +161,13 @@ public class StatsService {
         else if (distance >= 10.0) stridesLost += 50;  // 10k+
         else if (distance >= 5.0) stridesLost += 20;  // 5k+
 
-        stats.setStrides(stats.getStrides() - stridesLost);
-        log.debug("User lost [%d] strides for this run".formatted(stridesLost));
+        int balance = stats.getStrides() - stridesLost;
+        if (balance < 0) {
+            stats.setStrides(0);
+        } else {
+            stats.setStrides(stats.getStrides() - stridesLost);
+        }
+        log.debug("User left with [%d] strides after deleting this run".formatted(balance));
     }
 
     private void updatePersonalBestsAfterDeleteRun(Stats stats, User user) {

@@ -1,6 +1,5 @@
 package com.gergov.runnaLog.user.service;
 
-import com.gergov.runnaLog.event.SuccessfulRegistrationEvent;
 import com.gergov.runnaLog.exception.UserEmailAlreadyExistsException;
 import com.gergov.runnaLog.exception.UserNotFoundException;
 import com.gergov.runnaLog.exception.UsernameAlreadyExistsException;
@@ -14,11 +13,14 @@ import com.gergov.runnaLog.user.repository.UserRepository;
 import com.gergov.runnaLog.web.dto.DailyKmDto;
 import com.gergov.runnaLog.web.dto.EditProfileRequest;
 import com.gergov.runnaLog.web.dto.RegisterRequest;
+import com.gergov.runnaLog.web.dto.UserDto;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.Aware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,8 +30,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,35 +42,32 @@ public class UserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final StatsService statsService;
     private final SubscriptionService subscriptionService;
-    private final ApplicationEventPublisher eventPublisher;
     private final RunRepository runRepository;
     private final List<DailyKmDto> leaderboardCache;
-
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, StatsService statsService,
-                       SubscriptionService subscriptionService, ApplicationEventPublisher eventPublisher,
-                       RunRepository runRepository, List<DailyKmDto> leaderboardCache) {
+                       SubscriptionService subscriptionService, RunRepository runRepository,
+                       List<DailyKmDto> leaderboardCache, RedisTemplate<String, Object> redisTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.statsService = statsService;
         this.subscriptionService = subscriptionService;
-        this.eventPublisher = eventPublisher;
         this.runRepository = runRepository;
         this.leaderboardCache = leaderboardCache;
+        this.redisTemplate = redisTemplate;
     }
 
     @Transactional
-    @CacheEvict(value = {"users", "usersById", "userDataByUsername"}, allEntries = true)
+    @CacheEvict(value = {"users", "userById"}, allEntries = true)
     public void register(RegisterRequest registerRequest) {
 
-        Optional<User> optionalUserName = userRepository.findByUsername(registerRequest.getUsername());
-        if (optionalUserName.isPresent()) {
-            throw new UsernameAlreadyExistsException("User with [%s] username already exists.".formatted(registerRequest.getUsername()));
+        if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
+            throw new UsernameAlreadyExistsException("This username is already taken.");
         }
 
-        Optional<User> optionalUserEmail = userRepository.findByEmail(registerRequest.getEmail());
-        if (optionalUserEmail.isPresent()) {
+        if (userRepository.findByEmail(registerRequest.getEmail()).isPresent()) {
             throw new UserEmailAlreadyExistsException("This email is used by another account.");
         }
 
@@ -86,74 +86,43 @@ public class UserService implements UserDetailsService {
         statsService.createDefaultStats(user);
         subscriptionService.createDefaultSubscription(user);
 
-        SuccessfulRegistrationEvent event = SuccessfulRegistrationEvent.builder()
-                .userId(user.getId())
-                .email(user.getEmail())
-                .createdOn(user.getCreatedOn())
-                .build();
-
-        eventPublisher.publishEvent(event);
-
-        log.info("New user profile was registered in the system for user [%s].".formatted(registerRequest.getUsername()));
+        log.info("New user registered: {}", user.getUsername());
     }
 
-//    @Cacheable("users")
-    public List<User> getAll() {
 
+    public List<User> getAll() {
         return userRepository.findAll();
     }
 
-//    @Cacheable("usersById")
+    @Cacheable(value = "userById", key = "#id")
+    public UserDto getByIdCached(UUID id) {
+        User user = getById(id);
+        return toDto(user);
+    }
+
     public User getById(UUID id) {
-
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User with [%s] id does not exist.".formatted(id)));
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User not found."));
     }
 
-//    @CacheEvict(value = {"users", "usersById", "userDataByUsername"})
+    @CacheEvict(value = {"users", "userById"}, allEntries = true)
     public void updateUserProfile(UUID id, EditProfileRequest editProfileRequest) {
-        User existingUser = getById(id);
-
-        existingUser.setFirstName(editProfileRequest.getFirstName());
-        existingUser.setLastName(editProfileRequest.getLastName());
-        existingUser.setProfilePicture(editProfileRequest.getProfilePicture());
-
-        userRepository.save(existingUser);
-    }
-
-
-    //Всеки път при логин операция, Секюрити ще вика този метод за да ни каже, че някой се опитва да се логне
-    //с това потребителско име или каквото решим(имейл, телефон ...)
-    //Цел на метода : Да кажа на Spring Security кой е потрбителя зад това потребителско име и той да бъде логнат
-    //Return type: Метода очаква да върнем UserDetails обект, който има данните на този потребител
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Username not found."));
-
-        return new UserData(user.getId(), username, user.getPassword(), user.getRole(), user.isActive());
+        User user = getById(id);
+        user.setFirstName(editProfileRequest.getFirstName());
+        user.setLastName(editProfileRequest.getLastName());
+        user.setProfilePicture(editProfileRequest.getProfilePicture());
+        userRepository.save(user);
     }
 
     @Transactional
-//    @CacheEvict(value = {"users", "usersById", "userDataByUsername"}, allEntries = true)
+    @CacheEvict(value = {"users", "userById"}, allEntries = true)
     public void deleteUser(UUID userId, UUID currentUserId) {
-        Optional<User> userOpt = userRepository.findById(userId);
-        if (userOpt.isEmpty() || !userOpt.get().getId().equals(userId)) {
-            return;
-        }
-
+        User user = getById(userId);
         if (userId.equals(currentUserId)) {
             throw new IllegalArgumentException("Cannot delete yourself.");
         }
-
-        userRepository.delete(userOpt.get());
-        log.info("Admin deleted user [{}]", userOpt.get().getUsername());
-    }
-
-//    @Cacheable("userDataByUsername")
-    public UserData findByUsername(String username) {
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Username not found."));
-        return new UserData(user.getId(), username, user.getPassword(), user.getRole(), user.isActive());
-
+        userRepository.delete(user);
+        log.info("Admin deleted user [{}]", user.getUsername());
     }
 
     public List<DailyKmDto> getLeaderboard() {
@@ -161,19 +130,15 @@ public class UserService implements UserDetailsService {
     }
 
     public void recalculateLeaderboard() {
-        // CLEAR the cache first!
         leaderboardCache.clear();
-
         List<Object[]> results = runRepository.findUsersSortedByTodayKm();
-
         results.forEach(row -> {
             UUID userId = (UUID) row[0];
             double km = (Double) row[1];
             User user = getById(userId);
             leaderboardCache.add(new DailyKmDto(userId, user.getUsername(), km));
         });
-
-        log.info("Leaderboard recalculated with {} users", leaderboardCache.size());
+        log.info("Leaderboard recalculated with {} entries", leaderboardCache.size());
     }
 
     public void resetLeaderboard() {
@@ -181,18 +146,60 @@ public class UserService implements UserDetailsService {
         log.info("Leaderboard reset");
     }
 
-//    @CacheEvict(value = "users", allEntries = true)
+    @CacheEvict(value = {"users", "userById"}, allEntries = true)
     public void switchRole(UUID userId) {
-
         User user = getById(userId);
-
-        if (user.getRole() == UserRole.USER) {
-            user.setRole(UserRole.ADMIN);
-        } else {
-            user.setRole(UserRole.USER);
-        }
-
+        user.setRole(user.getRole() == UserRole.USER ? UserRole.ADMIN : UserRole.USER);
         userRepository.save(user);
     }
-}
 
+    public List<User> getAllAdmin() {
+        return userRepository.findAllByRole(UserRole.ADMIN);
+    }
+
+    @Transactional
+    @CacheEvict(value = {"users", "userById"}, allEntries = true)
+    public void createAdmin(RegisterRequest registerRequest) {
+        User user = User.builder()
+                .username(registerRequest.getUsername())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .role(UserRole.ADMIN)
+                .country(registerRequest.getCountry())
+                .active(true)
+                .createdOn(LocalDateTime.now())
+                .updatedOn(LocalDateTime.now())
+                .build();
+
+        userRepository.save(user);
+        statsService.createDefaultStats(user);
+        subscriptionService.createDefaultSubscription(user);
+
+        log.info("Admin created: {}", user.getUsername());
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found."));
+        return new UserData(user.getId(), user.getUsername(), user.getPassword(), user.getRole(), user.isActive());
+    }
+
+    private UserDto toDto(User user) {
+        return new UserDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole().name(),
+                user.isActive(),
+                user.getCreatedOn()
+        );
+    }
+
+    public List<String> getAllUsernames() {
+        Set<String> keys = redisTemplate.keys("userDataByUsername::*");
+        return keys.stream()
+                .map(k -> k.replace("userDataByUsername::", ""))
+                .collect(Collectors.toList());
+    }
+}

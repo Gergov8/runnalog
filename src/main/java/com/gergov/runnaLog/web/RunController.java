@@ -61,6 +61,7 @@ public class RunController {
         if (bindingResult.hasErrors()) {
             ModelAndView modelAndView = new ModelAndView("add-run");
             modelAndView.addObject("userId", userData.getId());
+
             return modelAndView;
         }
 
@@ -80,17 +81,9 @@ public class RunController {
         Run run = runService.getRunById(runId);
         User user = run.getUser();
         String username = principal.getName();
-        UserData currentUser = userService.findByUsername(username);
+        UserData currentUser = (UserData) userService.loadUserByUsername(username);
 
-        ModelAndView modelAndView = new ModelAndView("run-details");
-        modelAndView.addObject("run", run);
-        modelAndView.addObject("user", user);
-        modelAndView.addObject("currentUser", currentUser);
-        modelAndView.addObject("addCommentRequest", addCommentRequest);
-        modelAndView.addObject("comments", commentService.getCommentsForRun(runId));
-
-
-        return modelAndView;
+        return getRunDetailsModelAndView(runId, addCommentRequest, run, user, currentUser);
     }
 
     @DeleteMapping("/{userId}/delete/{runId}")
@@ -98,10 +91,9 @@ public class RunController {
                                   @PathVariable UUID userId,
                                   @PathVariable UUID runId) {
 
-        Run run = runService.getRunById(runId);
         User currentUser = userService.getById(userData.getId());
 
-        runService.deleteRun(currentUser, run);
+        runService.deleteRun(currentUser, runId);
 
         return new ModelAndView("redirect:/runs/" + userId);
     }
@@ -168,6 +160,18 @@ public class RunController {
         commentService.deleteComment(currentUser, run, comment);
 
         return new ModelAndView("redirect:/runs/" + runId + "/details");
+    }
+
+    private ModelAndView getRunDetailsModelAndView(UUID runId, AddCommentRequest addCommentRequest, Run run, User user, UserData currentUser) {
+        ModelAndView modelAndView = new ModelAndView("run-details");
+        modelAndView.addObject("run", run);
+        modelAndView.addObject("user", user);
+        modelAndView.addObject("currentUser", currentUser);
+        modelAndView.addObject("addCommentRequest", addCommentRequest);
+        modelAndView.addObject("comments", commentService.getCommentsForRun(runId));
+
+
+        return modelAndView;
     }
 
 }

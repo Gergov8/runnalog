@@ -462,7 +462,7 @@
                     <span th:if="${user.active == true}" class="status public">ACTIVE</span>
                     <span th:if="${user.active == false}" class="status private">INACTIVE</span>
                 </td>
-                <td data-label="Created on" th:text="${#temporals.format(user.createdOn, 'dd MMM YYYY HH:mm')}">01 Jan 2025 08:30</td>
+                <td data-label="Created on" th:text="${user.createdOn}">01 Jan 2025 08:30</td>
                 <td sec:authorize="hasRole('ADMIN')" data-label="Actions">
                     <form th:action="@{'/users' + '/delete/' + ${user.id} }" th:method="delete" style="display: inline;">
                         <input type="hidden" name="_method" value="DELETE" />

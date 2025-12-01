@@ -1,5 +1,6 @@
 package com.gergov.runnaLog.subscription.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.gergov.runnaLog.user.model.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -21,6 +22,7 @@ public class Subscription {
     private UUID id;
 
     @ManyToOne
+    @JsonBackReference
     private User user;
 
     @Column(nullable = false)

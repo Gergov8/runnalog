@@ -1,5 +1,7 @@
 package com.gergov.runnaLog.run.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.gergov.runnaLog.comment.model.Comment;
 import com.gergov.runnaLog.like.model.Like;
 import com.gergov.runnaLog.user.model.User;
@@ -34,7 +36,6 @@ public class Run {
     @Transient
     private double score;
 
-
     @Column(nullable = false)
     private Double distance;
 
@@ -57,11 +58,14 @@ public class Run {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 
-    @OneToMany(mappedBy = "run", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Comment> comments = new ArrayList<>();
+    @OneToMany(mappedBy = "run", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Like> likes;
 
-    @OneToMany(mappedBy = "run", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Like> likes = new ArrayList<>();
+    @OneToMany(mappedBy = "run", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Comment> comments;
 }

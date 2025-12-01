@@ -1,11 +1,14 @@
 package com.gergov.runnaLog.user.service;
 
 import com.gergov.runnaLog.user.model.User;
+import com.gergov.runnaLog.user.model.UserRole;
 import com.gergov.runnaLog.user.property.UserProperties;
 import com.gergov.runnaLog.web.dto.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -26,11 +29,11 @@ public class UserInit implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-        List<User> users = userService.getAll();
+        List<User> users = userService.getAllAdmin();
 
-        boolean defaultUserDoesNotExist = users.stream().noneMatch(user -> user.getUsername().equals(userProperties.getDefaultUser().getUsername()));
+        boolean defaultAdminUserDoesNotExist = users.stream().noneMatch(user -> user.getRole().equals(UserRole.ADMIN));
 
-        if (defaultUserDoesNotExist) {
+        if (defaultAdminUserDoesNotExist) {
 
             RegisterRequest registerRequest = RegisterRequest.builder()
                     .username(userProperties.getDefaultUser().getUsername())
@@ -39,7 +42,7 @@ public class UserInit implements ApplicationRunner {
                     .country(userProperties.getDefaultUser().getCountry())
                     .build();
 
-            userService.register(registerRequest);
+            userService.createAdmin(registerRequest);
         }
     }
 }

@@ -72,6 +72,14 @@
 <main class="page">
     <section class="card">
         <h1 class="card-title">Choose Your Plan</h1>
+
+        <div th:if="${param.error}"
+             class="text-red-500 text-center mt-4 font-semibold">
+            <p th:text="${param.error}"></p>
+        </div>
+
+        <p class="error-message" th:if="${errorMessage}"  th:text="${errorMessage}"></p>
+
         <div class="plans">
             <!-- Recreational Plan -->
             <form th:action="@{/subscriptions/purchase}" th:object="${subscriptionUpgradeRequest}" method="post" class="plan-card">

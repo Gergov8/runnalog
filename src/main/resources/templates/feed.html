@@ -64,7 +64,7 @@
     <div class="logo"><a href="/feed">RUNNALOG</a></div>
     <div class="header-actions">
         <div class="strides-balance-header">
-            <span class="strides-amount-header" th:text="${stats.strides}">12,500</span>
+            <span class="strides-amount-header" th:text="${stats != null} ? ${stats.strides} : 0">12,500</span>
             <span class="strides-label-header">Strides</span>
         </div>
 
@@ -122,18 +122,27 @@
         <section class="runs-section col-span-6">
             <article th:each="run : ${feedRuns}" class="feed-card">
                 <div class="feed-header">
-                    <a th:href="${'/runs/' + run.userId()}"> <div class="avatar-sm">
-                        <img th:src="${#strings.isEmpty(run.profilePic())
-                  ? 'https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg'
-                  : run.profilePic()}"
-                             alt="Profile picture">
-                    </div></a>
+                    <a th:href="${'/runs/' + run.userId}">
+                        <div class="avatar-sm">
+                            <img th:src="${#strings.isEmpty(run.profilePic)
+                             ? 'https://www.svgrepo.com/show/384670/account-avatar-profile-user.svg'
+                             : run.profilePic}"
+                                 alt="Profile picture">
+                        </div>
+                    </a>
 
                     <div>
-                        <a th:href="${'/runs/' + run.id() + '/details'}"><div class="feed-user" th:text="${run.title}">title</div></a>
-                        <a th:href="${'/runs/' + run.userId()}"><strong><div class="feed-sub" th:text="${run.username}">username</div></strong></a>
+                        <a th:href="${'/runs/' + run.id + '/details'}">
+                            <div class="feed-user" th:text="${run.title}">title</div>
+                        </a>
+                        <a th:href="${'/runs/' + run.userId}">
+                            <strong>
+                                <div class="feed-sub" th:text="${run.username}">username</div>
+                            </strong>
+                        </a>
                     </div>
                 </div>
+
                 <div class="metrics">
                     <div class="metric">
                         <div class="metric-k">Distance</div>
@@ -148,21 +157,21 @@
                         <div class="metric-v" th:text="${run.pace} + ' /km'">05:00 /km</div>
                     </div>
                 </div>
+
                 <div class="feed-actions">
-                    <form th:action="${'/runs/' + run.id + '/' + (run.likedByCurrentUser ? 'unlike' : 'like')}"
-                          method="post">
+                    <form th:action="${'/runs/' + run.id + '/' + (run.likedByCurrentUser ? 'unlike' : 'like')}" method="post">
                         <input type="hidden" name="_csrf" th:value="${_csrf.token}">
                         <button class="like-btn" th:classappend="${run.likedByCurrentUser} ? ' liked' : ''">
                             <span class="heart-icon" th:text="${run.likedByCurrentUser} ? '❤️' : '🤍'"></span>
-                            <span th:text="${run.likesCount}"></span>
+                            <span th:text="${run.likesCount}">0</span>
                         </button>
                     </form>
 
                     <button class="comment-btn">💬 Comment</button>
                     <button class="share-btn">↗ Share</button>
                 </div>
-
             </article>
+
         </section>
 
         <aside class="leaderboard-card col-span-3">

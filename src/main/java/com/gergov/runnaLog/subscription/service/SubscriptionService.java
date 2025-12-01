@@ -1,6 +1,6 @@
 package com.gergov.runnaLog.subscription.service;
 
-import com.gergov.runnaLog.event.SuccessfulChargeEvent;
+import com.gergov.runnaLog.security.UserData;
 import com.gergov.runnaLog.stats.model.Stats;
 import com.gergov.runnaLog.stats.repository.StatsRepository;
 import com.gergov.runnaLog.subscription.model.Subscription;
@@ -11,7 +11,6 @@ import com.gergov.runnaLog.subscription.repository.SubscriptionRepository;
 import com.gergov.runnaLog.user.model.User;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,16 +20,16 @@ public class SubscriptionService {
 
     private final SubscriptionRepository subscriptionRepository;
     private final StatsRepository statsRepository;
-    private final ApplicationEventPublisher eventPublisher;
 
 
     @Autowired
-    public SubscriptionService(SubscriptionRepository subscriptionRepository, StatsRepository statsRepository, ApplicationEventPublisher eventPublisher) {
+    public SubscriptionService(SubscriptionRepository subscriptionRepository, StatsRepository statsRepository) {
         this.subscriptionRepository = subscriptionRepository;
         this.statsRepository = statsRepository;
-        this.eventPublisher = eventPublisher;
     }
 
+
+    @Transactional
     public void createDefaultSubscription(User user) {
 
         Subscription subscription = Subscription.builder()
@@ -84,16 +83,6 @@ public class SubscriptionService {
 
         subscriptionRepository.save(newSubscription);
 
-        SuccessfulChargeEvent event = SuccessfulChargeEvent.builder()
-                .userId(user.getId())
-                .type(type)
-                .email(user.getEmail())
-                .amount(price)
-                .createdOn(LocalDateTime.now())
-                .build();
-
-        eventPublisher.publishEvent(event);
-
         return true;
     }
 
@@ -109,19 +98,6 @@ public class SubscriptionService {
                 activeSubscription.getType() == SubscriptionType.ELITE &&
                 activeSubscription.getStatus() == SubscriptionStatus.ACTIVE &&
                 activeSubscription.getExpiryOn().isAfter(LocalDateTime.now());
-        }
-
-        public boolean hasActiveSubscriptionOfType(User user, SubscriptionType type) {
-            if (user == null) {
-                return false;
-            }
-
-         Subscription activeSubscription = subscriptionRepository.findLatestActiveByUser(user);
-
-            return activeSubscription != null &&
-                    activeSubscription.getType() == type &&
-                    activeSubscription.getStatus() == SubscriptionStatus.ACTIVE &&
-                    activeSubscription.getExpiryOn().isAfter(LocalDateTime.now());
         }
 
         public Subscription getActiveSubscription(User user) {

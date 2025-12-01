@@ -20,10 +20,8 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/subscriptions")
 public class SubscriptionController {
 
-
     private final UserService userService;
     private final SubscriptionService subscriptionService;
-
 
     @Autowired
     public SubscriptionController(UserService userService, SubscriptionService subscriptionService) {
@@ -33,7 +31,6 @@ public class SubscriptionController {
 
     @GetMapping
     public ModelAndView getUpgradePage(@AuthenticationPrincipal UserData userData) {
-
 
         User user = userService.getById(userData.getId());
         Stats stats = user.getStats();
@@ -46,7 +43,6 @@ public class SubscriptionController {
         return modelAndView;
     }
 
-    // /subscriptions/history
     @GetMapping("/history")
     public ModelAndView getSubscriptionHistoryPage(@AuthenticationPrincipal UserData userData) {
 
@@ -69,11 +65,7 @@ public class SubscriptionController {
         Stats stats = user.getStats();
 
         if (bindingResult.hasErrors()) {
-            ModelAndView mav = new ModelAndView("subscriptions");
-            mav.addObject("error", "Invalid subscription data. Please try again.");
-            mav.addObject("stats", stats);
-            mav.addObject("subscriptionUpgradeRequest", new SubscriptionUpgradeRequest());
-            return new ModelAndView("redirect:/subscriptions?errorrr");
+            return getSubscriptionPurchaseModelAndView("Invalid subscription data. Please try again.", stats);
         }
 
         boolean success = subscriptionService.purchaseSubscription(user, subscriptionUpgradeRequest.getType());
@@ -81,13 +73,15 @@ public class SubscriptionController {
         if (success) {
             return new ModelAndView("redirect:/subscriptions?success");
         } else {
-            ModelAndView mav = new ModelAndView("subscriptions");
-            mav.addObject("error", "Not enough STR to purchase this plan.");
-            mav.addObject("stats", stats);
-            mav.addObject("subscriptionUpgradeRequest", new SubscriptionUpgradeRequest());
-            return new ModelAndView("redirect:/subscriptions?error");
+            return getSubscriptionPurchaseModelAndView("Not enough STR to purchase this plan.", stats);
         }
     }
 
-
+    private static ModelAndView getSubscriptionPurchaseModelAndView(String attributeValue, Stats stats) {
+        ModelAndView mav = new ModelAndView("subscriptions");
+        mav.addObject("error", attributeValue);
+        mav.addObject("stats", stats);
+        mav.addObject("subscriptionUpgradeRequest", new SubscriptionUpgradeRequest());
+        return new ModelAndView("redirect:/subscriptions?error=" + attributeValue);
+    }
 }

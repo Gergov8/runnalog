@@ -25,7 +25,6 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final RunRepository runRepository;
 
-
     public CommentService(CommentRepository commentRepository, RunRepository runRepository) {
         this.commentRepository = commentRepository;
         this.runRepository = runRepository;
@@ -33,9 +32,9 @@ public class CommentService {
 
     @Transactional
     @CacheEvict(value = {"allCommentsForRun", "commentsById"}, allEntries = true)
-    public void addComment(UUID runId, AddCommentRequest addCommentRequest , User user) {
+    public void addComment(UUID runId, AddCommentRequest addCommentRequest, User user) {
         Optional<Run> runOpt = runRepository.findById(runId);
-        if(runOpt.isEmpty()) {
+        if (runOpt.isEmpty()) {
             return;
         }
 
@@ -48,17 +47,14 @@ public class CommentService {
 
         commentRepository.save(comment);
     }
-
-    @Cacheable("allCommentsForRun")
     public List<Comment> getCommentsForRun(UUID runId) {
         Optional<Run> runOpt = runRepository.findById(runId);
         return runOpt.map(commentRepository::findByRunOrderByCreatedOnAsc).orElse(null);
     }
 
     @Transactional
-    @CacheEvict(value = {"allCommentsForRun", "commentsById"}, allEntries = true)
+    @CacheEvict(value = "commentsById", allEntries = true)
     public void deleteComment(User user, Run run, Comment comment) {
-
         boolean isCommentOwner = comment.getUser().getId().equals(user.getId());
         boolean isAdmin = user.getRole().getDisplayName().equals("Admin");
         boolean isRunOwner = run.getUser().getId().equals(user.getId());
@@ -71,9 +67,9 @@ public class CommentService {
         log.info("User [{}] deleted comment [{}] for run [{}]", user.getUsername(), comment.getId(), run.getId());
     }
 
-    @Cacheable("commentsById")
-    public Comment getCommentById(UUID runId) {
-        Optional<Comment> commentOpt = commentRepository.findById(runId);
+    @Cacheable(value = "commentsById", key = "#commentId")
+    public Comment getCommentById(UUID commentId) {
+        Optional<Comment> commentOpt = commentRepository.findById(commentId);
         return commentOpt.orElse(null);
     }
 }
