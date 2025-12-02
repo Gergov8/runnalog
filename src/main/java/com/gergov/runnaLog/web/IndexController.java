@@ -73,8 +73,6 @@ public class IndexController {
         return modelAndView;
     }
 
-    // After POST, PUT, PATCH, DELETE requests we do "redirect:/endpoint"
-    // Redirect = tells the client where to send the GET request
     @PostMapping("/register")
     public ModelAndView register(@Valid RegisterRequest registerRequest,
                                  BindingResult bindingResult,

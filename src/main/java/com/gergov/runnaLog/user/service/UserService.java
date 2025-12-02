@@ -16,7 +16,6 @@ import com.gergov.runnaLog.web.dto.RegisterRequest;
 import com.gergov.runnaLog.web.dto.UserDto;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.Aware;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -27,6 +26,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -61,7 +61,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     @CacheEvict(value = {"users", "userById"}, allEntries = true)
-    public void register(RegisterRequest registerRequest) {
+    public User register(RegisterRequest registerRequest) {
 
         if (userRepository.findByUsername(registerRequest.getUsername()).isPresent()) {
             throw new UsernameAlreadyExistsException("This username is already taken.");
@@ -87,6 +87,7 @@ public class UserService implements UserDetailsService {
         subscriptionService.createDefaultSubscription(user);
 
         log.info("New user registered: {}", user.getUsername());
+        return user;
     }
 
 
@@ -131,7 +132,12 @@ public class UserService implements UserDetailsService {
 
     public void recalculateLeaderboard() {
         leaderboardCache.clear();
-        List<Object[]> results = runRepository.findUsersSortedByTodayKm();
+
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+
+        List<Object[]> results = runRepository.findUsersSortedByTodayKm(startOfDay, endOfDay);
         results.forEach(row -> {
             UUID userId = (UUID) row[0];
             double km = (Double) row[1];

@@ -3,6 +3,8 @@ package com.gergov.runnaLog.web;
 import com.gergov.runnaLog.security.UserData;
 import com.gergov.runnaLog.stats.model.Stats;
 import com.gergov.runnaLog.subscription.model.Subscription;
+import com.gergov.runnaLog.subscription.model.SubscriptionPeriod;
+import com.gergov.runnaLog.subscription.model.SubscriptionStatus;
 import com.gergov.runnaLog.subscription.model.SubscriptionType;
 import com.gergov.runnaLog.user.model.User;
 import com.gergov.runnaLog.user.model.UserRole;
@@ -41,6 +43,9 @@ class UserControllerApiTest {
 
         Subscription subscription = new Subscription();
         subscription.setType(SubscriptionType.RECREATIONAL);
+        subscription.setStatus(SubscriptionStatus.ACTIVE);
+        subscription.setPeriod(SubscriptionPeriod.MONTHLY);
+
 
         User user = new User();
         user.setId(userId);
@@ -94,7 +99,7 @@ class UserControllerApiTest {
         mockMvc.perform(post("/users/profile")
                         .param("firstName", "John")
                         .param("lastName", "Doe")
-                        .param("profilePicture", "pic.png")
+                        .param("profilePicture", "https://example.com/pic.png")
                         .with(user(userData))
                         .with(csrf()))
                 .andExpect(status().is3xxRedirection())

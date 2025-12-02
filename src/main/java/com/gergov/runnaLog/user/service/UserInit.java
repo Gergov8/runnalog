@@ -7,6 +7,7 @@ import com.gergov.runnaLog.web.dto.RegisterRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -15,6 +16,7 @@ import java.util.List;
 
 
 @Component
+@Profile("!test")
 public class UserInit implements ApplicationRunner {
 
     private final UserService userService;

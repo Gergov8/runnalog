@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,8 +27,11 @@ public interface RunRepository extends JpaRepository<Run, UUID> {
 
     @Query("SELECT r.user.id AS userId, SUM(r.distance) AS totalKm " +
             "FROM Run r " +
-            "WHERE DATE(r.createdOn) = CURRENT_DATE " +
+            "WHERE r.createdOn >= :startOfDay AND r.createdOn < :endOfDay " +
             "GROUP BY r.user.id " +
             "ORDER BY totalKm DESC")
-    List<Object[]> findUsersSortedByTodayKm();
+    List<Object[]> findUsersSortedByTodayKm(@Param("startOfDay") LocalDateTime startOfDay,
+                                            @Param("endOfDay") LocalDateTime endOfDay);
+
+
 }

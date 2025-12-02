@@ -10,18 +10,24 @@ import com.gergov.runnaLog.subscription.service.SubscriptionService;
 import com.gergov.runnaLog.user.model.User;
 import com.gergov.runnaLog.user.model.UserCountry;
 import com.gergov.runnaLog.user.model.UserRole;
+import com.gergov.runnaLog.user.property.UserProperties;
 import com.gergov.runnaLog.user.repository.UserRepository;
+import com.gergov.runnaLog.user.service.UserInit;
 import com.gergov.runnaLog.user.service.UserService;
 import com.gergov.runnaLog.web.dto.DailyKmDto;
 import com.gergov.runnaLog.web.dto.EditProfileRequest;
 import com.gergov.runnaLog.web.dto.RegisterRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,8 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceUTest {
@@ -48,7 +53,6 @@ public class UserServiceUTest {
     private RunRepository runRepository;
     @Mock
     private List<DailyKmDto> leaderboardCache;
-
     @InjectMocks
     private UserService userService;
 
@@ -192,30 +196,6 @@ public class UserServiceUTest {
         assertThrows(RuntimeException.class, () -> userService.loadUserByUsername("missing"));
     }
 
-//    @Test
-//    void findByUsername_ShouldReturnUserDetails() {
-//        User user = new User();
-//        user.setId(UUID.randomUUID());
-//        user.setUsername("john");
-//        user.setPassword("123");
-//        user.setRole(UserRole.USER);
-//        user.setActive(true);
-//
-//        when(userRepository.findByUsername("john")).thenReturn(Optional.of(user));
-//
-//        UserData data = userService.findByUsername("john");
-//
-//        assertEquals("john", data.getUsername());
-//        assertEquals("123", data.getPassword());
-//        assertEquals(user.getId(), data.getId());
-//    }
-//
-//    @Test
-//    void findByUsername_ShouldThrow_WhenNotFound() {
-//        when(userRepository.findByUsername("missing")).thenReturn(Optional.empty());
-//        assertThrows(RuntimeException.class, () -> userService.findByUsername("missing"));
-//    }
-
     @Test
     void deleteUser_ShouldDelete_WhenValid() {
         UUID id = UUID.randomUUID();
@@ -264,7 +244,11 @@ public class UserServiceUTest {
 
         UUID id = UUID.randomUUID();
 
-        when(runRepository.findUsersSortedByTodayKm())
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay();
+        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
+
+        when(runRepository.findUsersSortedByTodayKm(startOfDay, endOfDay))
                 .thenReturn(
                         java.util.List.<Object[]>of(new Object[]{id, 10.0})
                 );
@@ -315,6 +299,4 @@ public class UserServiceUTest {
         verify(statsService).createDefaultStats(any(User.class));
         verify(subscriptionService).createDefaultSubscription(any(User.class));
     }
-
-
 }

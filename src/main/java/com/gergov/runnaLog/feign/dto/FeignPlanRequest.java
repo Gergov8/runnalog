@@ -1,10 +1,15 @@
 package com.gergov.runnaLog.feign.dto;
 
+import lombok.*;
+
 import java.util.UUID;
 
-public record FeignPlanRequest(
-        UUID userId,
-        Double distanceKm,
-        String planLevel,
-        int daysPerWeek
-) {}
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class FeignPlanRequest {
+        private UUID userId;
+        private Double distanceKm;
+        private String planLevel;
+        private int daysPerWeek;
+ }
