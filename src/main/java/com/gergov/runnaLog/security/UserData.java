@@ -27,11 +27,6 @@ public class UserData implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-//        SimpleGrantedAuthority role = new SimpleGrantedAuthority("ROLE_" + this.role.name());
-//        SimpleGrantedAuthority permission1 = new SimpleGrantedAuthority("upgrade_plan");
-//        SimpleGrantedAuthority permission2 = new SimpleGrantedAuthority("view_all_runs");
-//        SimpleGrantedAuthority permission3 = new SimpleGrantedAuthority("view_all_users");
-
         SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role.name());
 
         return List.of(authority);

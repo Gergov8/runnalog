@@ -39,6 +39,7 @@ public class TrainingPlanService {
     }
 
     public CreatePlanResponse createTrainingPlan(CreatePlanRequest request) {
+
         log.info("Sending request to microservice: {}", request);
 
         FeignPlanRequest feignRequest = new FeignPlanRequest(
@@ -70,12 +71,6 @@ public class TrainingPlanService {
             log.error("Failed to delete training plan with ID: {}", planId, e);
             throw new RuntimeException("Failed to delete training plan: " + e.getMessage(), e);
         }
-    }
-
-    // Get user's plans with details
-    private List<PlanClient> getUserPlansWithDetails(UUID userId) {
-        // We'll implement this in Approach 2
-        return Collections.emptyList();
     }
 
     public List<Plan> getUserPlans(UUID userId) {

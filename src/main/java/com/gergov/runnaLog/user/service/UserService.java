@@ -13,13 +13,10 @@ import com.gergov.runnaLog.user.repository.UserRepository;
 import com.gergov.runnaLog.web.dto.DailyKmDto;
 import com.gergov.runnaLog.web.dto.EditProfileRequest;
 import com.gergov.runnaLog.web.dto.RegisterRequest;
-import com.gergov.runnaLog.web.dto.UserDto;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -30,9 +27,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -44,19 +39,17 @@ public class UserService implements UserDetailsService {
     private final SubscriptionService subscriptionService;
     private final RunRepository runRepository;
     private final List<DailyKmDto> leaderboardCache;
-    private final RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, StatsService statsService,
                        SubscriptionService subscriptionService, RunRepository runRepository,
-                       List<DailyKmDto> leaderboardCache, RedisTemplate<String, Object> redisTemplate) {
+                       List<DailyKmDto> leaderboardCache) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.statsService = statsService;
         this.subscriptionService = subscriptionService;
         this.runRepository = runRepository;
         this.leaderboardCache = leaderboardCache;
-        this.redisTemplate = redisTemplate;
     }
 
     @Transactional
@@ -95,12 +88,6 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll();
     }
 
-    @Cacheable(value = "userById", key = "#id")
-    public UserDto getByIdCached(UUID id) {
-        User user = getById(id);
-        return toDto(user);
-    }
-
     public User getById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found."));
@@ -108,20 +95,24 @@ public class UserService implements UserDetailsService {
 
     @CacheEvict(value = {"users", "userById"}, allEntries = true)
     public void updateUserProfile(UUID id, EditProfileRequest editProfileRequest) {
+
         User user = getById(id);
         user.setFirstName(editProfileRequest.getFirstName());
         user.setLastName(editProfileRequest.getLastName());
         user.setProfilePicture(editProfileRequest.getProfilePicture());
+
         userRepository.save(user);
     }
 
     @Transactional
     @CacheEvict(value = {"users", "userById"}, allEntries = true)
     public void deleteUser(UUID userId, UUID currentUserId) {
+
         User user = getById(userId);
         if (userId.equals(currentUserId)) {
             throw new IllegalArgumentException("Cannot delete yourself.");
         }
+
         userRepository.delete(user);
         log.info("Admin deleted user [{}]", user.getUsername());
     }
@@ -131,6 +122,7 @@ public class UserService implements UserDetailsService {
     }
 
     public void recalculateLeaderboard() {
+
         leaderboardCache.clear();
 
         LocalDate today = LocalDate.now();
@@ -144,6 +136,7 @@ public class UserService implements UserDetailsService {
             User user = getById(userId);
             leaderboardCache.add(new DailyKmDto(userId, user.getUsername(), km));
         });
+
         log.info("Leaderboard recalculated with {} entries", leaderboardCache.size());
     }
 
@@ -154,8 +147,10 @@ public class UserService implements UserDetailsService {
 
     @CacheEvict(value = {"users", "userById"}, allEntries = true)
     public void switchRole(UUID userId) {
+
         User user = getById(userId);
         user.setRole(user.getRole() == UserRole.USER ? UserRole.ADMIN : UserRole.USER);
+
         userRepository.save(user);
     }
 
@@ -166,6 +161,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     @CacheEvict(value = {"users", "userById"}, allEntries = true)
     public void createAdmin(RegisterRequest registerRequest) {
+
         User user = User.builder()
                 .username(registerRequest.getUsername())
                 .email(registerRequest.getEmail())
@@ -189,23 +185,5 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found."));
         return new UserData(user.getId(), user.getUsername(), user.getPassword(), user.getRole(), user.isActive());
-    }
-
-    private UserDto toDto(User user) {
-        return new UserDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getRole().name(),
-                user.isActive(),
-                user.getCreatedOn()
-        );
-    }
-
-    public List<String> getAllUsernames() {
-        Set<String> keys = redisTemplate.keys("userDataByUsername::*");
-        return keys.stream()
-                .map(k -> k.replace("userDataByUsername::", ""))
-                .collect(Collectors.toList());
     }
 }

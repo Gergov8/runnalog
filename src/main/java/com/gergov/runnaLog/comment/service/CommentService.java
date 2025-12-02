@@ -47,14 +47,19 @@ public class CommentService {
 
         commentRepository.save(comment);
     }
+
     public List<Comment> getCommentsForRun(UUID runId) {
+
         Optional<Run> runOpt = runRepository.findById(runId);
-        return runOpt.map(commentRepository::findByRunOrderByCreatedOnAsc).orElse(null);
+
+        return runOpt.map(commentRepository::findByRunOrderByCreatedOnAsc)
+                .orElse(null);
     }
 
     @Transactional
     @CacheEvict(value = "commentsById", allEntries = true)
     public void deleteComment(User user, Run run, Comment comment) {
+
         boolean isCommentOwner = comment.getUser().getId().equals(user.getId());
         boolean isAdmin = user.getRole().getDisplayName().equals("Admin");
         boolean isRunOwner = run.getUser().getId().equals(user.getId());
@@ -69,7 +74,9 @@ public class CommentService {
 
     @Cacheable(value = "commentsById", key = "#commentId")
     public Comment getCommentById(UUID commentId) {
+
         Optional<Comment> commentOpt = commentRepository.findById(commentId);
+
         return commentOpt.orElse(null);
     }
 }

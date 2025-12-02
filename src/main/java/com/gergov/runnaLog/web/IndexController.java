@@ -53,16 +53,6 @@ public class IndexController {
         return modelAndView;
     }
 
-    // Form Handling steps:
-    // 1. Return HTML form with empty object
-    // 2. Use this empty object in the html form to fill the data
-    // 3. Get the object filled with data via POST request
-    // 4. Validate the received object - @Valid
-    // 5. Capture all the validation errors if any exist - BindingResult
-    // 6. Check if there are validation errors - if (bindingResult.hasErrors())
-    //  - If there are errors -> show the same page and visualize errors - th:if="${#fields.hasErrors('username')}" th:errors="*{username}"
-    //  - If there aren't any errors, display the next page ->
-
     @GetMapping("/register")
     public ModelAndView getRegisterPage() {
 

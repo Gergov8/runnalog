@@ -81,25 +81,21 @@ class IndexControllerApiTest {
 
     @Test
     void getFeedPage_ShouldReturnFeedViewWithModel() throws Exception {
-        // Prepare mock UserData (AuthenticationPrincipal)
         UUID userId = UUID.randomUUID();
         UserData mockUserData = new UserData(userId, "testuser", "password", UserRole.USER, true);
 
-        // Prepare mock User and Stats
         User mockUser = new User();
         mockUser.setId(userId);
         mockUser.setUsername("testuser");
         Stats stats = new Stats();
         mockUser.setStats(stats);
 
-        // Mock services
         when(userService.getById(any(UUID.class))).thenReturn(mockUser);
         when(userService.getLeaderboard()).thenReturn(Collections.emptyList());
         when(runService.getFeed(any(User.class))).thenReturn(Collections.emptyList());
         when(subscriptionService.hasActiveEliteSubscription(any(User.class))).thenReturn(true);
         when(subscriptionService.getActiveSubscription(any(User.class))).thenReturn(new Subscription());
 
-        // Perform GET /feed with mocked authentication
         mockMvc.perform(get("/feed").with(user(mockUserData)))
                 .andExpect(status().isOk())
                 .andExpect(view().name("feed"))

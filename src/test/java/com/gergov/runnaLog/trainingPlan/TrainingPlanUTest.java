@@ -10,7 +10,6 @@ import com.gergov.runnaLog.trainingPlan.service.TrainingPlanService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
@@ -24,14 +23,14 @@ import static org.mockito.Mockito.*;
 class TrainingPlanUTest {
 
     @Mock
-    private PlanClient planClient; // <- annotate as @Mock
+    private PlanClient planClient;
 
     private TrainingPlanService trainingPlanService;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this); // <- initialize @Mock fields
-        trainingPlanService = new TrainingPlanService(planClient); // inject mock
+        MockitoAnnotations.openMocks(this);
+        trainingPlanService = new TrainingPlanService(planClient);
     }
 
     @Test

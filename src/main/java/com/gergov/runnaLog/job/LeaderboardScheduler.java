@@ -8,10 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LeaderboardScheduler {
 
-
     private final UserService userService;
-
-
 
     @Autowired
     public LeaderboardScheduler(UserService userService) {
@@ -19,10 +16,11 @@ public class LeaderboardScheduler {
 
     }
 
-    // every 60 sec = 60000 ms
     @Scheduled(fixedRate = 60000)
     public void updateLiveLeaderboard() {
+
         userService.recalculateLeaderboard();
+
         System.out.println("Live leaderboard updated");
     }
 

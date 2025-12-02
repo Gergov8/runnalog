@@ -41,6 +41,7 @@ public class RunService {
     @Transactional
     @CacheEvict(value = {"visibleRuns", "feed"}, allEntries = true)
     public void createRun(CreateRunRequest createRunRequest, User user) {
+
         Duration duration = Duration.ofHours(createRunRequest.getDurationHours())
                 .plusMinutes(createRunRequest.getDurationMinutes())
                 .plusSeconds(createRunRequest.getDurationSeconds());
@@ -75,17 +76,22 @@ public class RunService {
     }
 
     private String calculatePace(long totalSeconds, Double distance) {
+
         double paceSecondsPerKm = totalSeconds / distance;
         long minutes = (long) (paceSecondsPerKm / 60);
         long seconds = (long) (paceSecondsPerKm % 60);
+
         return String.format("%d:%02d", minutes, seconds);
     }
 
     @Cacheable(value = "visibleRuns", key = "#currentUser != null ? #currentUser.id : 'guest'")
     public List<Run> getVisibleRuns(User currentUser) {
+
         if (currentUser == null) {
+
             return runRepository.findByVisibilityOrderByCreatedOnDesc(RunVisibility.PUBLIC);
         } else {
+
             return runRepository.findVisibleRunsForUser(currentUser);
         }
     }
@@ -93,6 +99,7 @@ public class RunService {
     @Transactional
     @CacheEvict(value = {"visibleRuns", "feed"}, allEntries = true)
     public void deleteRun(User user, UUID runId) {
+
         Run run = runRepository.findById(runId)
                 .orElseThrow(() -> new EntityNotFoundException("Run not found"));
 
@@ -110,6 +117,7 @@ public class RunService {
 
     @Cacheable(value = "feed", key = "#currentUser != null ? #currentUser.id : 'guest'")
     public List<RunResponseDto> getFeed(User currentUser) {
+
         return getVisibleRuns(currentUser).stream()
                 .map(run -> new RunResponseDto(
                         run.getId(),
@@ -127,19 +135,23 @@ public class RunService {
     }
 
     private String formatDuration(Duration duration) {
+
         long hours = duration.toHours();
         long minutes = duration.toMinutesPart();
         long seconds = duration.toSecondsPart();
+
         return hours > 0
                 ? String.format("%d:%02d:%02d", hours, minutes, seconds)
                 : String.format("%02d:%02d", minutes, seconds);
     }
 
     public List<Run> getRunsByUser(User user) {
+
         return runRepository.findByUser(user);
     }
 
     public Run getRunById(UUID runId) {
+
         return runRepository.findById(runId)
                 .orElseThrow(() -> new RuntimeException("Run with [%s] id not found.".formatted(runId)));
     }

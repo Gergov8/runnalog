@@ -77,7 +77,7 @@ public class GlobalControllerAdvice {
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
-    public ModelAndView handleLeftOverException(Exception e) {
+    public ModelAndView handleLeftOverException() {
 
         ModelAndView modelAndView = new ModelAndView("error-message");
 

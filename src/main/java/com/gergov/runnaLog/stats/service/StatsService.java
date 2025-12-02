@@ -50,6 +50,7 @@ public class StatsService {
     }
 
     public void updateUserStatsAfterRun(User user, Double distance, long totalSeconds, String pace) {
+
         Stats stats = user.getStats();
         stats.setTotalRuns(stats.getTotalRuns() + 1);
         stats.setTotalDistance(stats.getTotalDistance() + distance);
@@ -90,30 +91,41 @@ public class StatsService {
         }
     }
 
-    // Получава темпо в секунди на ккм (за изчисления) (извлечено от формат "3:30" и превърнато в 220сек.)
     private Integer parsePaceToSeconds(String paceString) {
 
         String[] parts = paceString.split(":");
+
         int minutes = Integer.parseInt(parts[0]);
         int seconds = Integer.parseInt(parts[1]);
+
         return (minutes * 60) + seconds;
     }
 
     private void updateStridesEarned(Stats stats, Double distance, Integer totalSeconds) {
-        // Основно вънаграждение -> 10 strides на км
+
         int stridesEarned = (int) (distance * 10);
 
         double paceMinPerKm = (totalSeconds / 60.0) / distance;
 
-        // Бонус за скорост -> по-бързо темпо = повече strides
-        if (paceMinPerKm < 4.0) stridesEarned += 50;  // Elite pace (< 4:00 min/km)
-        else if (paceMinPerKm < 5.0) stridesEarned += 30;  // Fast pace (< 5:00 min/km)
-        else if (paceMinPerKm < 6.0) stridesEarned += 15;  // Average pace (< 6:00 min/km)
+        if (paceMinPerKm < 4.0) {
+            stridesEarned += 50;
+        }
+        else if (paceMinPerKm < 5.0) {
+            stridesEarned += 30;
+        }
+        else if (paceMinPerKm < 6.0) {
+            stridesEarned += 15;
+        }
 
-        // Бонус за дистанция
-        if (distance >= 21.1) stridesEarned += 100;  // Half-marathon
-        else if (distance >= 10.0) stridesEarned += 50;  // 10k+
-        else if (distance >= 5.0) stridesEarned += 20;  // 5k+
+        if (distance >= 21.1) {
+            stridesEarned += 100;
+        }
+        else if (distance >= 10.0) {
+            stridesEarned += 50;
+        }
+        else if (distance >= 5.0) {
+            stridesEarned += 20;
+        }
 
         stats.setStrides(stats.getStrides() + stridesEarned);
         log.debug("User earned [%d] strides for this run".formatted(stridesEarned));
@@ -149,17 +161,18 @@ public class StatsService {
     }
 
     private void updateStridesEarnedAfterDelete(Stats stats, Double distance, int totalSeconds) {
+
         int stridesLost = (int) (distance * 10);
 
         double paceMinPerKm = (totalSeconds / 60.0) / distance;
 
-        if (paceMinPerKm < 4.0) stridesLost += 50;  // Elite pace (< 4:00 min/km)
-        else if (paceMinPerKm < 5.0) stridesLost += 30;  // Fast pace (< 5:00 min/km)
-        else if (paceMinPerKm < 6.0) stridesLost += 15;  // Average pace (< 6:00 min/km)
+        if (paceMinPerKm < 4.0) stridesLost += 50;
+        else if (paceMinPerKm < 5.0) stridesLost += 30;
+        else if (paceMinPerKm < 6.0) stridesLost += 15;
 
-        if (distance >= 21.1) stridesLost += 100;  // Half-marathon
-        else if (distance >= 10.0) stridesLost += 50;  // 10k+
-        else if (distance >= 5.0) stridesLost += 20;  // 5k+
+        if (distance >= 21.1) stridesLost += 100;
+        else if (distance >= 10.0) stridesLost += 50;
+        else if (distance >= 5.0) stridesLost += 20;
 
         int balance = stats.getStrides() - stridesLost;
         if (balance < 0) {
@@ -167,10 +180,12 @@ public class StatsService {
         } else {
             stats.setStrides(stats.getStrides() - stridesLost);
         }
+
         log.debug("User left with [%d] strides after deleting this run".formatted(balance));
     }
 
     private void updatePersonalBestsAfterDeleteRun(Stats stats, User user) {
+
         List<Run> runs = runRepository.findPublicRunsByUserOrderByPaceDesc(user);
 
         if (runs.isEmpty()) {

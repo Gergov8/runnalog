@@ -17,7 +17,6 @@ import java.util.UUID;
 @Service
 public class LikeService {
 
-
     private final LikeRepository likeRepository;
     private final RunRepository runRepository;
 
@@ -30,6 +29,7 @@ public class LikeService {
     @Transactional
     @CacheEvict(value = {"likesCount", "feed"}, allEntries = true)
     public void likeRun(UUID runId, User user) {
+
         Optional<Run> runOpt = runRepository.findById(runId);
         if (runOpt.isEmpty()) {
             return;
@@ -38,7 +38,7 @@ public class LikeService {
         Run run = runOpt.get();
 
         if (likeRepository.existsByUserAndRun(user, run)) {
-            return; // Вече е харесано
+            return;
         }
 
         Like like = Like.builder()
@@ -53,7 +53,9 @@ public class LikeService {
     @Transactional
     @CacheEvict(value = {"likesCount", "feed"}, allEntries = true)
     public void unlikeRun(UUID runId, User user) {
+
         Optional<Run> runOpt = runRepository.findById(runId);
+
         if (runOpt.isEmpty()) {
             return;
         }
@@ -61,7 +63,7 @@ public class LikeService {
         Run run = runOpt.get();
 
         if (!likeRepository.existsByUserAndRun(user, run)) {
-            return; // Още не е харесано
+            return;
         }
 
         likeRepository.deleteByUserAndRun(user, run);
@@ -69,11 +71,15 @@ public class LikeService {
 
     @Cacheable("likesCount")
     public int getLikesCount(UUID runId) {
+
         Optional<Run> runOpt = runRepository.findById(runId);
-        return runOpt.map(run -> likeRepository.findByRun(run).size()).orElse(0);
+
+        return runOpt.map(run -> likeRepository.findByRun(run).size())
+                .orElse(0);
     }
 
     public boolean isRunLikedByUser(User user, Run run) {
+
         return likeRepository.existsByUserAndRun(user, run);
     }
 

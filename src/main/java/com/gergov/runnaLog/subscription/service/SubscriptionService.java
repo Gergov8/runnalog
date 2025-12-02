@@ -1,6 +1,5 @@
 package com.gergov.runnaLog.subscription.service;
 
-import com.gergov.runnaLog.security.UserData;
 import com.gergov.runnaLog.stats.model.Stats;
 import com.gergov.runnaLog.stats.repository.StatsRepository;
 import com.gergov.runnaLog.subscription.model.Subscription;
@@ -52,7 +51,6 @@ public class SubscriptionService {
         Stats stats = user.getStats();
         Subscription existingSubscription = subscriptionRepository.findLatestByUser(user);
 
-        // Determine price based on type
         int price = switch (type) {
             case RECREATIONAL -> 0;
             case COMPETITIVE -> 6000;
@@ -66,7 +64,6 @@ public class SubscriptionService {
         stats.setStrides(stats.getStrides() - price);
         statsRepository.save(stats);
 
-        // Create and save subscription
         Subscription newSubscription = Subscription.builder()
                 .user(user)
                 .status(SubscriptionStatus.ACTIVE)
@@ -87,11 +84,11 @@ public class SubscriptionService {
     }
 
     public boolean hasActiveEliteSubscription(User user) {
+
         if (user == null) {
             return false;
         }
 
-        // Get the latest active subscription for the user
         Subscription activeSubscription = subscriptionRepository.findLatestActiveByUser(user);
 
         return activeSubscription != null &&
@@ -101,9 +98,11 @@ public class SubscriptionService {
         }
 
         public Subscription getActiveSubscription(User user) {
+
             if (user == null) {
                 return null;
             }
+
             return subscriptionRepository.findLatestActiveByUser(user);
         }
     }

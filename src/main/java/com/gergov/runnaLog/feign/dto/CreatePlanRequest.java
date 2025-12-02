@@ -19,8 +19,4 @@ public class CreatePlanRequest {
     private SubscriptionType planLevel;
     private Integer daysPerWeek;
 
-    // This getter returns the SubscriptionType enum
-    public SubscriptionType getPlanLevel() {
-        return planLevel;
-    }
 }
