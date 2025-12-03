@@ -2,11 +2,9 @@ package com.gergov.runnaLog.web.dto;
 
 import com.gergov.runnaLog.run.model.RunVisibility;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+@Builder
 @Getter
 @Setter
 @AllArgsConstructor

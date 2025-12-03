@@ -155,4 +155,8 @@ public class RunService {
         return runRepository.findById(runId)
                 .orElseThrow(() -> new RuntimeException("Run with [%s] id not found.".formatted(runId)));
     }
+
+    public List<Run> getAllRuns() {
+        return runRepository.findAll();
+    }
 }

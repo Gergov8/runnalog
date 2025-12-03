@@ -46,6 +46,25 @@ public class StatsService {
                 .build();
 
         statsRepository.save(stats);
+    }
+
+    @Transactional
+    public void createDefaultStatsForDefaultUser(User user) {
+
+        Stats stats = Stats.builder()
+                .user(user)
+                .totalRuns(0)
+                .totalDistance(0.0)
+                .totalDuration(0)
+                .pb1km(null)
+                .pb5km(null)
+                .pb10km(null)
+                .runnerLevel(1)
+                .strides(6425)
+                .lastActivity(LocalDateTime.now())
+                .build();
+
+        statsRepository.save(stats);
 
     }
 

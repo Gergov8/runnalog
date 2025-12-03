@@ -49,13 +49,6 @@
     <img src="/images/background.png" alt="Background" />
 </div>
 
-<!-- Floating particles -->
-<div class="particles">
-    <span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span>
-</div>
-
 <!-- Header -->
 <div class="header">
     <div class="logo">RUNNALOG</div>
@@ -70,15 +63,7 @@
     <div class="card">
         <div class="card-title">Subscription History</div>
 
-        <!-- Empty state (optional) -->
-        <div th:if="${user.subscriptions.empty}" class="empty-state">
-            <div class="icon">📊</div>
-            <h3>No Subscriptions Yet</h3>
-            <p>You haven't subscribed to any plans yet.</p>
-            <a href="/subscriptions" class="btn btn-primary" style="margin-top: 1rem;">Browse Plans</a>
-        </div>
-
-        <table class="subscription-table" th:unless="${user.subscriptions.empty}">
+        <table class="subscription-table">
             <thead>
             <tr>
                 <th>Id</th>

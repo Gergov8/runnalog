@@ -49,13 +49,6 @@
     <img src="/images/background.png" alt="Background" />
 </div>
 
-<!-- Floating particles -->
-<div class="particles">
-    <span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span>
-    <span></span><span></span><span></span><span></span><span></span>
-</div>
-
 <!-- Header -->
 <header class="header">
     <div class="logo"><a href="/feed">RUNNALOG</a></div>
@@ -95,31 +88,15 @@
                 <button class="btn btn-outline" type="submit">Current Plan</button>
             </form>
 
-            <!-- Competitive Plan -->
-            <form th:action="@{/subscriptions/purchase}" th:object="${subscriptionUpgradeRequest}" method="post" class="plan-card">
-                <input type="hidden" name="type" value="COMPETITIVE">
-                <div class="plan-title">Competitive</div>
-                <div class="plan-price">6000 STR / month</div>
-                <ul class="plan-features">
-                    <li>Advanced analytics</li>
-                    <li>Custom training plans</li>
-                    <li>No advertisements</li>
-                    <li>Priority support</li>
-                    <li>Export capabilities</li>
-                </ul>
-                <button class="btn btn-primary" type="submit">Upgrade Now</button>
-            </form>
-
             <!-- Elite Plan -->
             <form th:action="@{/subscriptions/purchase}" th:object="${subscriptionUpgradeRequest}" method="post" class="plan-card">
                 <input type="hidden" name="type" value="ELITE">
                 <div class="plan-title">Elite</div>
-                <div class="plan-price">15000 STR / month</div>
+                <div class="plan-price">6000 STR / month</div>
                 <ul class="plan-features">
-                    <li>Everything in Competitive</li>
-                    <li>1-on-1 coaching sessions</li>
-                    <li>Exclusive events</li>
-                    <li>Personalized gear recommendations</li>
+                    <li>Comprehensive Ai coaching</li>
+                    <li>Unlimited training plans</li>
+                    <li>Personalized training recommendations</li>
                     <li>Early access to features</li>
                 </ul>
                 <button class="btn btn-primary" type="submit">Go Elite</button>

@@ -13,10 +13,28 @@ public class UserProperties {
 
     private DefaultUser defaultUser;
 
+    private DefaultUser2 defaultUser2;
+
     private String testProperty;
+
+    private String testProperty2;
 
     @Data
     public static class DefaultUser {
+
+        private String username;
+
+        private String email;
+
+        private String password;
+
+        private UserCountry country;
+
+        private UserRole role;
+    }
+
+    @Data
+    public static class DefaultUser2 {
 
         private String username;
 

@@ -64,24 +64,6 @@
     rgba(26, 31, 36, 0) 100%);
 }
 
-/* Subtle golden particles for athletic vibe */
-.particles span:nth-child(1) { left: 88%; bottom: 20%; animation-duration: 12s; }
-.particles span:nth-child(2) { left: 92%; bottom: 35%; animation-duration: 14s; }
-.particles span:nth-child(3) { left: 80%; bottom: 28%; animation-duration: 16s; }
-.particles span:nth-child(4) { left: 86%; bottom: 12%; animation-duration: 18s; }
-.particles span:nth-child(5) { left: 74%; bottom: 22%; animation-duration: 20s; }
-.particles span:nth-child(6) { left: 68%; bottom: 18%; animation-duration: 22s; }
-.particles span:nth-child(7) { left: 95%; bottom: 50%; animation-duration: 19s; }
-.particles span:nth-child(8) { left: 82%; bottom: 40%; animation-duration: 17s; }
-.particles span:nth-child(9) { left: 72%; bottom: 30%; animation-duration: 23s; }
-.particles span:nth-child(10) { left: 90%; bottom: 10%; animation-duration: 21s; }
-.particles span:nth-child(11) { left: 60%; bottom: 25%; animation-duration: 15s; }
-.particles span:nth-child(12) { left: 85%; bottom: 55%; animation-duration: 24s; }
-.particles span:nth-child(13) { left: 78%; bottom: 15%; animation-duration: 19s; }
-.particles span:nth-child(14) { left: 70%; bottom: 45%; animation-duration: 26s; }
-.particles span:nth-child(15) { left: 93%; bottom: 65%; animation-duration: 22s; }
-.particles span:nth-child(16) { left: 65%; bottom: 35%; animation-duration: 25s; }
-
 @keyframes riseIn {
     from {
         transform: translateY(-50%) translateY(14px);

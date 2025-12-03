@@ -53,8 +53,7 @@ public class SubscriptionService {
 
         int price = switch (type) {
             case RECREATIONAL -> 0;
-            case COMPETITIVE -> 6000;
-            case ELITE -> 15000;
+            case COMPETITIVE, ELITE -> 6000;
         };
 
         if (stats.getStrides() < price) {

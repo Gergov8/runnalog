@@ -340,29 +340,6 @@
     background: rgba(0, 0, 0, 0.5);
 }
 
-.particles {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: -5;
-}
-
-.particles span {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-    background: linear-gradient(
-            to bottom right,
-            rgba(255, 233, 175, 0.85),
-            rgba(245, 231, 197, 0.4)
-    );
-    filter: drop-shadow(0 0 4px rgba(245, 231, 197, 0.6));
-    opacity: 0.75;
-    animation: float 12s ease-in-out infinite;
-    transform-origin: center;
-}
-
 @keyframes float {
     0% {
         transform: translateY(0) rotate(0deg);
@@ -377,21 +354,3 @@
         opacity: 0.7;
     }
 }
-
-/* Particle positioning */
-.particles span:nth-child(1) { left: 12%; bottom: 20%; animation-duration: 12s; }
-.particles span:nth-child(2) { left: 8%; bottom: 35%; animation-duration: 14s; }
-.particles span:nth-child(3) { left: 20%; bottom: 28%; animation-duration: 16s; }
-.particles span:nth-child(4) { left: 14%; bottom: 12%; animation-duration: 18s; }
-.particles span:nth-child(5) { left: 26%; bottom: 22%; animation-duration: 20s; }
-.particles span:nth-child(6) { left: 32%; bottom: 18%; animation-duration: 22s; }
-.particles span:nth-child(7) { left: 5%; bottom: 50%; animation-duration: 19s; }
-.particles span:nth-child(8) { left: 18%; bottom: 40%; animation-duration: 17s; }
-.particles span:nth-child(9) { left: 28%; bottom: 30%; animation-duration: 23s; }
-.particles span:nth-child(10) { left: 10%; bottom: 10%; animation-duration: 21s; }
-.particles span:nth-child(11) { left: 40%; bottom: 25%; animation-duration: 15s; }
-.particles span:nth-child(12) { left: 15%; bottom: 55%; animation-duration: 24s; }
-.particles span:nth-child(13) { left: 22%; bottom: 15%; animation-duration: 19s; }
-.particles span:nth-child(14) { left: 30%; bottom: 45%; animation-duration: 26s; }
-.particles span:nth-child(15) { left: 7%; bottom: 65%; animation-duration: 22s; }
-.particles span:nth-child(16) { left: 35%; bottom: 35%; animation-duration: 25s; }

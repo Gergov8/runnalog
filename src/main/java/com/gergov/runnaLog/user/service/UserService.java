@@ -100,7 +100,6 @@ public class UserService implements UserDetailsService {
         user.setFirstName(editProfileRequest.getFirstName());
         user.setLastName(editProfileRequest.getLastName());
         user.setProfilePicture(editProfileRequest.getProfilePicture());
-
         userRepository.save(user);
     }
 
@@ -155,6 +154,7 @@ public class UserService implements UserDetailsService {
     }
 
     public List<User> getAllAdmin() {
+
         return userRepository.findAllByRole(UserRole.ADMIN);
     }
 
@@ -177,7 +177,29 @@ public class UserService implements UserDetailsService {
         statsService.createDefaultStats(user);
         subscriptionService.createDefaultSubscription(user);
 
-        log.info("Admin created: {}", user.getUsername());
+        log.info("Admin username and password created: {} , {}", user.getUsername(), registerRequest.getPassword());
+    }
+
+    @Transactional
+    @CacheEvict(value = {"users", "userById"}, allEntries = true)
+    public void createDefaultUser(RegisterRequest registerRequest) {
+
+        User user = User.builder()
+                .username(registerRequest.getUsername())
+                .email(registerRequest.getEmail())
+                .password(passwordEncoder.encode(registerRequest.getPassword()))
+                .role(UserRole.USER)
+                .country(registerRequest.getCountry())
+                .active(true)
+                .createdOn(LocalDateTime.now())
+                .updatedOn(LocalDateTime.now())
+                .build();
+
+        userRepository.save(user);
+        statsService.createDefaultStatsForDefaultUser(user);
+        subscriptionService.createDefaultSubscription(user);
+
+        log.info("Default user with username and password created: {} , {}", user.getUsername(), registerRequest.getPassword());
     }
 
     @Override
@@ -185,5 +207,10 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Username not found."));
         return new UserData(user.getId(), user.getUsername(), user.getPassword(), user.getRole(), user.isActive());
+    }
+
+    public User getByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Username not found."));
     }
 }
