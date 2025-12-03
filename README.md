@@ -12,7 +12,7 @@
 - **In-App Currency System** – Earn and spend **STRIDES (STR)** for upgrades
 
 ### 🏃 **Running Features**
-- **Log Runs** – Track distance, time, pace, and routes
+- **Log Runs** – Track distance, time and pace
 - **View History** – Personal running log with statistics
 - **Social Feed** – See other runners' activities
 - **Like & Comment** – Engage with the community
