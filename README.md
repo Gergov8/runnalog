@@ -22,12 +22,10 @@
 - **Free Tier** – Basic features
 - **Elite Subscription** – Unlock premium features with STR
 - **Admin Features** – Full system access
-- **AI Personal Trainer** – *(Elite/Admin only)* Get custom training plans based on your preferences
 
-### 🤖 **AI Integration**
-- **Personalized Plans** – AI-generated training schedules
-- **Smart Recommendations** – Based on your running history
-- **Progress Analysis** – Get insights on your performance
+### 🤖 **AI Integration (REST Api)** – *(Elite/Admin only)* Get custom training plans based on your preferences
+- **Personalized Plans** – AI-generated training schedules based on your current level, distance goal and training days preferences
+
 
 ---
 
