@@ -156,9 +156,9 @@
                             <span th:text="${run.likesCount}">0</span>
                         </button>
                     </form>
-
-                    <button class="comment-btn">💬 Comment</button>
-                    <button class="share-btn">↗ Share</button>
+                    <a th:href="${'/runs/' + run.id + '/details'}">
+                        <button class="comment-btn">💬 Comment</button>
+                    </a>
                 </div>
             </article>
 
