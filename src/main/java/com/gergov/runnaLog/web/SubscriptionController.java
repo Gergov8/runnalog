@@ -2,6 +2,7 @@ package com.gergov.runnaLog.web;
 
 import com.gergov.runnaLog.security.UserData;
 import com.gergov.runnaLog.stats.model.Stats;
+import com.gergov.runnaLog.subscription.model.Subscription;
 import com.gergov.runnaLog.subscription.service.SubscriptionService;
 import com.gergov.runnaLog.user.model.User;
 import com.gergov.runnaLog.user.service.UserService;
@@ -35,9 +36,12 @@ public class SubscriptionController {
         User user = userService.getById(userData.getId());
         Stats stats = user.getStats();
 
+        Subscription activeSubscription = subscriptionService.getActiveSubscription(user);
+
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName("subscriptions");
         modelAndView.addObject("subscriptionUpgradeRequest", new SubscriptionUpgradeRequest());
+        modelAndView.addObject("userSub", activeSubscription);
         modelAndView.addObject("stats", stats);
 
         return modelAndView;

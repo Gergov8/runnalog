@@ -85,7 +85,12 @@
                     <li>Basic statistics</li>
                     <li>Community access</li>
                 </ul>
-                <button class="btn btn-outline" type="submit">Current Plan</button>
+                <div th:if="${userSub.type == T(com.gergov.runnaLog.subscription.model.SubscriptionType).RECREATIONAL}">
+                    <p class="btn btn-outline">Current Plan</p>
+                </div>
+                <div th:if="${userSub.type == T(com.gergov.runnaLog.subscription.model.SubscriptionType).ELITE}">
+                    <button class="btn btn-primary">Default plan</button>
+                </div>
             </form>
 
             <!-- Elite Plan -->
@@ -99,7 +104,12 @@
                     <li>Personalized training recommendations</li>
                     <li>Early access to features</li>
                 </ul>
-                <button class="btn btn-primary" type="submit">Go Elite</button>
+                <div th:if="${userSub.type == T(com.gergov.runnaLog.subscription.model.SubscriptionType).RECREATIONAL}">
+                    <button class="btn btn-primary" type="submit">Go Elite</button>
+                </div>
+                <div th:if="${userSub.type == T(com.gergov.runnaLog.subscription.model.SubscriptionType).ELITE}">
+                    <p class="btn btn-outline">Current Plan</p>
+                </div>
             </form>
         </div>
     </section>
