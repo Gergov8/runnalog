@@ -295,62 +295,149 @@ body {
         0 12px 36px rgba(0, 0, 0, .45);
 }
 
-/* ===== Steps - Floating Glass List ===== */
 .steps {
     position: relative;
-    margin-top: .8rem;
-    padding-left: 3.4rem;
-}
-
-.step {
     display: flex;
-    margin: 1.15rem 0;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08); /* Subtle horizontal separators */
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding: 0 1rem;
+    gap: 2rem;
 }
 
-.step:last-child {
-    border-bottom: none;
-}
-
-.bullet {
+/* Horizontal connecting line */
+.steps::before {
+    content: '';
     position: absolute;
-    left: .9rem;
-    backdrop-filter: blur(1px);
-    border-radius: 999px;
+    top: 1.5rem; /* vertical center for bullets */
+    left: 2.6rem;
+    right: 2.6rem;
+    height: 4px;
+    background: rgba(249,238,207,0.2);
+    border-radius: 2px;
+    z-index: 0;
+}
+
+/* Step container */
+.step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 1;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+/* Lift step on hover */
+.step:hover {
+    transform: translateY(-6px);
+}
+
+/* Bullet on the line */
+.bullet {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #f9eecf;
-    border: 1px solid rgba(255,255,255,0.25);
+    font-weight: 700;
     font-family: 'Montserrat', sans-serif;
-    display: grid;
-    place-items: center;
-    width: 2.6rem;
-    height: 2.6rem;
-    font-size: 1.15rem;
+    font-size: 1.2rem;
     background: radial-gradient(circle, rgba(255,255,255,0.25), rgba(255,255,255,0.08));
-    box-shadow: 0 0 18px rgba(255,255,255,0.2); /* Soft, diffused light */
-    text-shadow: 0px 0px 12px rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow: 0 0 20px rgba(255,255,255,0.25), inset 0 0 10px rgba(255,255,255,0.1);
+    z-index: 2;
 }
 
+/* Zigzag positioning */
 .step-body {
-    margin-left: 2rem;
+    margin-top: 1rem; /* above the line */
 }
 
+/* Glass step card */
+.step-body {
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    padding: 1rem 1.2rem;
+    max-width: 200px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+/* Lift card slightly on hover */
+.step:hover .step-body {
+    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+    transform: translateY(-5px);
+}
+
+/* Titles and subtitles */
 .step-title {
-    margin: 0 0 .15rem 0;
-    color: #f9eecf; /* Updated to match new gold */
-    font-size: clamp(1.06rem, 1.0rem + .28vw, 1.28rem);
-    letter-spacing: .2px;
+    margin: 0 0 0.4rem 0;
+    color: #f9eecf;
     font-weight: 600;
-    cursor: text;
+    font-size: clamp(1.05rem, 1rem + .25vw, 1.2rem);
+}
+
+/* Base symbol style */
+.step::before {
+    content: "";
+    position: absolute;
+    top: -1.5rem; /* above card */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1rem; /* smaller, minimalistic */
+    z-index: 3;
+    pointer-events: none;
+    color: var(--gold-1); /* main app gold */
+    text-shadow: 0 0 4px rgba(212,175,55,0.5);
+}
+
+/* Step-specific symbols */
+.step:nth-child(1)::before {
+    content: "●"; /* simple circle for “user/account” */
+}
+
+.step:nth-child(2)::before {
+    content: "➤"; /* arrow for “run/post” */
+}
+
+.step:nth-child(3)::before {
+    content: "★"; /* small star for “like/comment” */
+}
+
+/* Optional gentle floating animation */
+@keyframes floatSymbol {
+    0% { transform: translateX(-50%) translateY(0); }
+    100% { transform: translateX(-50%) translateY(-4px); }
+}
+
+.step::before {
+    animation: floatSymbol 2s ease-in-out infinite alternate;
 }
 
 .step-sub {
     margin: 0;
-    color: rgba(255,255,255,0.75); /* More neutral, airy gray text */
-    font-size: 0.9rem;
+    color: rgba(255,255,255,0.75);
+    font-size: 0.88rem;
     line-height: 1.35;
-    cursor: text;
 }
+
+/* Optional: Add small vertical connector for cards above/below line */
+.step-body::before {
+    content: '';
+    position: absolute;
+    top: -8px; /* adjust for card above */
+    bottom: auto;
+    left: 50%;
+    width: 2px;
+    height: 8px;
+    background: rgba(249,238,207,0.2);
+    transform: translateX(-50%);
+}
+
 
 /* ===== Athlete Section ===== */
 .athlete-section {
